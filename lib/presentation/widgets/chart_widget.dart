@@ -31,23 +31,23 @@ class ChartWidget extends StatelessWidget {
         final count = logs.where((l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == dayStr).length;
         if (count > maxY) maxY = count.toDouble();
         barGroups.add(BarChartGroupData(
-          x: 6 - i, 
-          barRods: [BarChartRodData(toY: count.toDouble(), color: const Color(0xFF3B82F6), width: 16, borderRadius: BorderRadius.circular(4))]
+            x: 6 - i,
+            barRods: [BarChartRodData(toY: count.toDouble(), color: const Color(0xFF3B82F6), width: 16, borderRadius: BorderRadius.circular(4))]
         ));
       }
     } else {
       // Monthly
-       final now = DateTime.now();
-       for (int i = 29; i >= 0; i--) {
-         final d = now.subtract(Duration(days: i));
-         final dayStr = DateFormat('yyyy-MM-dd').format(d);
-         final count = logs.where((l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == dayStr).length;
-         if (count > maxY) maxY = count.toDouble();
-         barGroups.add(BarChartGroupData(
-           x: 29 - i, 
-           barRods: [BarChartRodData(toY: count.toDouble(), color: const Color(0xFF0EA5E9), width: 6, borderRadius: BorderRadius.circular(2))]
-         ));
-       }
+      final now = DateTime.now();
+      for (int i = 29; i >= 0; i--) {
+        final d = now.subtract(Duration(days: i));
+        final dayStr = DateFormat('yyyy-MM-dd').format(d);
+        final count = logs.where((l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == dayStr).length;
+        if (count > maxY) maxY = count.toDouble();
+        barGroups.add(BarChartGroupData(
+            x: 29 - i,
+            barRods: [BarChartRodData(toY: count.toDouble(), color: const Color(0xFF0EA5E9), width: 6, borderRadius: BorderRadius.circular(2))]
+        ));
+      }
     }
 
     return BarChart(
@@ -57,8 +57,8 @@ class ChartWidget extends StatelessWidget {
         barTouchData: BarTouchData(
           enabled: true,
           touchTooltipData: BarTouchTooltipData(
-             tooltipBgColor: Colors.blueGrey,
-             getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(rod.toY.round().toString(), const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            tooltipBgColor: Colors.blueGrey,
+            getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(rod.toY.round().toString(), const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ),
         titlesData: FlTitlesData(
@@ -68,10 +68,10 @@ class ChartWidget extends StatelessWidget {
               showTitles: true,
               getTitlesWidget: (double value, TitleMeta meta) {
                 if (period == 'hourly') {
-                   return value % 4 == 0 ? Text('${value.toInt()}h', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)) : const SizedBox();
+                  return value % 4 == 0 ? Text('${value.toInt()}h', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)) : const SizedBox();
                 } else if (period == 'weekly') {
-                   final date = DateTime.now().subtract(Duration(days: 6 - value.toInt()));
-                   return Padding(padding: const EdgeInsets.only(top: 8.0), child: Text(DateFormat('E').format(date), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)));
+                  final date = DateTime.now().subtract(Duration(days: 6 - value.toInt()));
+                  return Padding(padding: const EdgeInsets.only(top: 8.0), child: Text(DateFormat('E').format(date), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)));
                 }
                 return const SizedBox();
               },
@@ -84,6 +84,7 @@ class ChartWidget extends StatelessWidget {
         ),
         gridData: const FlGridData(show: false),
         borderData: FlBorderData(show: false),
+        barGroups: barGroups,
       ),
     );
   }

@@ -16,14 +16,12 @@ class LogBloc extends Bloc<LogEvent, LogState> {
         super(LogState(now: DateTime.now())) {
     on<LoadLogs>(_onLoadLogs);
     on<AddLog>(_onAddLog);
+    on<UpdateLog>(_onUpdateLog);
     on<DeleteLog>(_onDeleteLog);
     on<ClearAllLogs>(_onClearAllLogs);
     on<UpdateTime>(_onUpdateTime);
 
-    // Initial Load
     add(LoadLogs());
-
-    // Start Timer for realtime updates
     _timer = Timer.periodic(const Duration(minutes: 1), (_) {
       add(UpdateTime());
     });
@@ -33,10 +31,7 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     emit(state.copyWith(status: LogStatus.loading));
     try {
       final logs = await _storageService.loadLogs();
-      emit(state.copyWith(
-        status: LogStatus.success,
-        logs: logs,
-      ));
+      emit(state.copyWith(status: LogStatus.success, logs: logs));
     } catch (_) {
       emit(state.copyWith(status: LogStatus.failure));
     }
@@ -46,9 +41,16 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     final newLog = Log(
       id: DateTime.now().millisecondsSinceEpoch,
       timestamp: DateTime.now(),
+      urineColor: event.color,
+      urineAmount: event.amount,
     );
     final updatedLogs = List<Log>.from(state.logs)..insert(0, newLog);
-    
+    emit(state.copyWith(logs: updatedLogs));
+    await _storageService.saveLogs(updatedLogs);
+  }
+
+  Future<void> _onUpdateLog(UpdateLog event, Emitter<LogState> emit) async {
+    final updatedLogs = state.logs.map((log) => log.id == event.log.id ? event.log : log).toList();
     emit(state.copyWith(logs: updatedLogs));
     await _storageService.saveLogs(updatedLogs);
   }
