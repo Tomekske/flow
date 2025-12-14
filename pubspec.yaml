@@ -49,6 +49,7 @@ dependencies:
   equatable: ^2.0.5
 
 dev_dependencies:
+  test: ^1.17.5
   flutter_test:
     sdk: flutter
 

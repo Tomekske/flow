@@ -42,11 +42,6 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
-              const Text("Hello, User", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-              const Text("Track your daily habits.", style: TextStyle(fontSize: 16, color: Color(0xFF64748B))),
-              const SizedBox(height: 32),
-
               GestureDetector(
                 onTap: () => _showLogDialog(context),
                 child: Container(
@@ -66,16 +61,13 @@ class HomePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text("LAST VISIT", style: TextStyle(color: Color(0xFFFFFBEB), fontSize: 10, fontWeight: FontWeight.bold)), const SizedBox(height: 4), Row(children: [const Icon(Icons.access_time, color: Colors.white, size: 16), const SizedBox(width: 6), Text(lastTime, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18))])]),
-                          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [Text(rateLabel.toUpperCase(), style: const TextStyle(color: Color(0xFFFFFBEB), fontSize: 10, fontWeight: FontWeight.bold)), const SizedBox(height: 4), Row(children: [Text(displayRate, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)), const SizedBox(width: 4), const Text("/ hr", style: TextStyle(color: Color(0xFFFFFBEB), fontSize: 12))])]),
+                          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [Text("VISIT RATE", style: const TextStyle(color: Color(0xFFFFFBEB), fontSize: 10, fontWeight: FontWeight.bold)), const SizedBox(height: 4), Row(children: [Text(displayRate, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)), const SizedBox(width: 4), const Text("/ hr", style: TextStyle(color: Color(0xFFFFFBEB), fontSize: 12))])]),
                         ],
                       )
                     ],
                   ),
                 ),
               ),
-              const Spacer(),
-              const Center(child: Text("Tap card to log", style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12))),
-              const SizedBox(height: 40),
             ],
           ),
         );
