@@ -15,7 +15,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
       : _storageService = storageService,
         super(LogState(now: DateTime.now())) {
     on<LoadLogs>(_onLoadLogs);
-    on<AddLog>(_onAddLog);
+    on<AddToiletLog>(_onAddToiletLog);
+    on<AddFluidLog>(_onAddFluidLog);
     on<UpdateLog>(_onUpdateLog);
     on<DeleteLog>(_onDeleteLog);
     on<ClearAllLogs>(_onClearAllLogs);
@@ -37,12 +38,26 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     }
   }
 
-  Future<void> _onAddLog(AddLog event, Emitter<LogState> emit) async {
+  Future<void> _onAddToiletLog(AddToiletLog event, Emitter<LogState> emit) async {
     final newLog = Log(
       id: DateTime.now().millisecondsSinceEpoch,
       timestamp: DateTime.now(),
+      type: 'toilet',
       urineColor: event.color,
       urineAmount: event.amount,
+    );
+    final updatedLogs = List<Log>.from(state.logs)..insert(0, newLog);
+    emit(state.copyWith(logs: updatedLogs));
+    await _storageService.saveLogs(updatedLogs);
+  }
+
+  Future<void> _onAddFluidLog(AddFluidLog event, Emitter<LogState> emit) async {
+    final newLog = Log(
+      id: DateTime.now().millisecondsSinceEpoch,
+      timestamp: DateTime.now(),
+      type: 'intake',
+      fluidType: event.fluidType,
+      volume: event.volume,
     );
     final updatedLogs = List<Log>.from(state.logs)..insert(0, newLog);
     emit(state.copyWith(logs: updatedLogs));

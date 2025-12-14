@@ -165,48 +165,48 @@ void main() {
     DateTime time(int h, int m) => DateTime(2023, 1, 1, h, m);
 
     // test('Returns zero if fewer than 2 logs', () {
-    //   final logs = [Log(timestamp: time(10, 0), id: 1)];
+    //   final logs = [Log(timestamp: time(10, 0), id: 1,type: 'toilet')];
     //   expect(StatsHelper.calculateHourlyRate(logs), Duration.zero);
     // });
 
     test('Calculates average time between logs correctly', () {
       final logs = [
         [
-          Log(timestamp: time(0, 15), id: 1),
-          Log(timestamp: time(0, 30), id: 2),
+          Log(timestamp: time(0, 15), id: 1,type: 'toilet'),
+          Log(timestamp: time(0, 30), id: 2,type: 'toilet'),
         ],
         [
           // Interval 1
-          Log(timestamp: time(0, 15), id: 1),
-          Log(timestamp: time(0, 30), id: 2),
+          Log(timestamp: time(0, 15), id: 1,type: 'toilet'),
+          Log(timestamp: time(0, 30), id: 2,type: 'toilet'),
 
           // Interval 2
-          Log(timestamp: time(1, 15), id: 1),
-          Log(timestamp: time(1, 30), id: 2),
+          Log(timestamp: time(1, 15), id: 1,type: 'toilet'),
+          Log(timestamp: time(1, 30), id: 2,type: 'toilet'),
         ],
         [
           // Interval 1
-          Log(timestamp: time(0, 15), id: 1),
-          Log(timestamp: time(0, 30), id: 2),
+          Log(timestamp: time(0, 15), id: 1,type: 'toilet'),
+          Log(timestamp: time(0, 30), id: 2,type: 'toilet'),
 
           // Interval 2
-          Log(timestamp: time(1, 15), id: 1),
-          Log(timestamp: time(1, 30), id: 2),
-          Log(timestamp: time(2, 15), id: 3),
+          Log(timestamp: time(1, 15), id: 1,type: 'toilet'),
+          Log(timestamp: time(1, 30), id: 2,type: 'toilet'),
+          Log(timestamp: time(2, 15), id: 3,type: 'toilet'),
 
           // Interval 3
-          Log(timestamp: time(2, 15), id: 1),
+          Log(timestamp: time(2, 15), id: 1,type: 'toilet'),
         ],
         [
           // Interval 1
-          Log(timestamp: time(0, 15), id: 1),
-          Log(timestamp: time(0, 30), id: 2),
-          Log(timestamp: time(2, 15), id: 1),
+          Log(timestamp: time(0, 15), id: 1,type: 'toilet'),
+          Log(timestamp: time(0, 30), id: 2,type: 'toilet'),
+          Log(timestamp: time(2, 15), id: 1,type: 'toilet'),
 
           // Interval 2
-          Log(timestamp: time(1, 15), id: 1),
-          Log(timestamp: time(1, 30), id: 2),
-          Log(timestamp: time(2, 15), id: 3),
+          Log(timestamp: time(1, 15), id: 1,type: 'toilet'),
+          Log(timestamp: time(1, 30), id: 2,type: 'toilet'),
+          Log(timestamp: time(2, 15), id: 3,type: 'toilet'),
         ]
       ];
 
