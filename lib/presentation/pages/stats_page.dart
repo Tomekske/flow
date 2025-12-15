@@ -22,10 +22,15 @@ class _StatsScreenState extends State<StatsScreen> {
       builder: (context, state) {
         final logs = state.logs;
         final now = state.now;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         final todayStr = DateFormat('yyyy-MM-dd').format(now);
-        final todayLogs = logs.where((l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == todayStr).toList();
-        
+        final todayLogs = logs
+            .where(
+              (l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == todayStr,
+            )
+            .toList();
+
         final dailyStats = StatsHelper.calculateStats(todayLogs, now: now);
         final globalStats = StatsHelper.calculateStats(logs, now: null);
 
@@ -35,13 +40,23 @@ class _StatsScreenState extends State<StatsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              const Text("Analytics", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+              Text(
+                "Analytics",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
+              ),
               const SizedBox(height: 24),
-              
+
               // Segmented Control
               Container(
                 padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: const Color(0xFFE2E8F0), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : const Color(0xFFE2E8F0),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Row(
                   children: ['hourly', 'weekly', 'monthly'].map((period) {
                     final bool isSelected = _chartPeriod == period;
@@ -50,9 +65,35 @@ class _StatsScreenState extends State<StatsScreen> {
                         onTap: () => setState(() => _chartPeriod = period),
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(color: isSelected ? Colors.white : Colors.transparent, borderRadius: BorderRadius.circular(8), boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2)] : []),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? (isDark ? Colors.grey[700] : Colors.white)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 2,
+                                    ),
+                                  ]
+                                : [],
+                          ),
                           alignment: Alignment.center,
-                          child: Text(period.toUpperCase(), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? const Color(0xFF1E293B) : const Color(0xFF64748B))),
+                          child: Text(
+                            period.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected
+                                  ? (isDark
+                                        ? Colors.white
+                                        : const Color(0xFF1E293B))
+                                  : (isDark
+                                        ? Colors.grey[400]
+                                        : const Color(0xFF64748B)),
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -62,16 +103,22 @@ class _StatsScreenState extends State<StatsScreen> {
               const SizedBox(height: 24),
               Container(
                 height: 250,
-                padding: const EdgeInsets.only(top: 24, right: 16, left: 8, bottom: 8),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: const Color(0xFFF1F5F9))),
+                padding: const EdgeInsets.only(
+                  top: 24,
+                  right: 16,
+                  left: 8,
+                  bottom: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.transparent
+                        : const Color(0xFFF1F5F9),
+                  ),
+                ),
                 child: ChartWidget(logs: logs, period: _chartPeriod),
-              ),
-              const SizedBox(height: 24),
-              FrequencyCard(
-                dailyRate: dailyStats['rate']!,
-                globalRate: globalStats['rate']!,
-                dailyInterval: dailyStats['interval']!,
-                globalInterval: globalStats['interval']!,
               ),
             ],
           ),

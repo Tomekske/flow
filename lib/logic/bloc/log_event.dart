@@ -6,9 +6,8 @@ abstract class LogEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadLogs extends LogEvent {}
+class LoadData extends LogEvent {}
 
-// Add Toilet Log
 class AddToiletLog extends LogEvent {
   final int? color;
   final String? amount;
@@ -17,7 +16,6 @@ class AddToiletLog extends LogEvent {
   List<Object> get props => [color ?? 0, amount ?? ''];
 }
 
-// Add Fluid Log
 class AddFluidLog extends LogEvent {
   final String fluidType;
   final int volume;
@@ -41,4 +39,13 @@ class DeleteLog extends LogEvent {
 }
 
 class ClearAllLogs extends LogEvent {}
+
+class UpdateSettings extends LogEvent {
+  final String? theme;
+  final double? goal;
+  const UpdateSettings({this.theme, this.goal});
+  @override
+  List<Object> get props => [theme ?? '', goal ?? 0];
+}
+
 class UpdateTime extends LogEvent {}

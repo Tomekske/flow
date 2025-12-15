@@ -12,33 +12,45 @@ class LogBloc extends Bloc<LogEvent, LogState> {
   Timer? _timer;
 
   LogBloc({required StorageService storageService})
-      : _storageService = storageService,
-        super(LogState(now: DateTime.now())) {
-    on<LoadLogs>(_onLoadLogs);
+    : _storageService = storageService,
+      super(LogState(now: DateTime.now())) {
+    on<LoadData>(_onLoadData);
     on<AddToiletLog>(_onAddToiletLog);
     on<AddFluidLog>(_onAddFluidLog);
     on<UpdateLog>(_onUpdateLog);
     on<DeleteLog>(_onDeleteLog);
     on<ClearAllLogs>(_onClearAllLogs);
+    on<UpdateSettings>(_onUpdateSettings);
     on<UpdateTime>(_onUpdateTime);
 
-    add(LoadLogs());
+    add(LoadData());
     _timer = Timer.periodic(const Duration(minutes: 1), (_) {
       add(UpdateTime());
     });
   }
 
-  Future<void> _onLoadLogs(LoadLogs event, Emitter<LogState> emit) async {
+  Future<void> _onLoadData(LoadData event, Emitter<LogState> emit) async {
     emit(state.copyWith(status: LogStatus.loading));
     try {
       final logs = await _storageService.loadLogs();
-      emit(state.copyWith(status: LogStatus.success, logs: logs));
+      final settings = await _storageService.loadSettings();
+      emit(
+        state.copyWith(
+          status: LogStatus.success,
+          logs: logs,
+          theme: settings['theme'],
+          dailyGoal: settings['goal'],
+        ),
+      );
     } catch (_) {
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
 
-  Future<void> _onAddToiletLog(AddToiletLog event, Emitter<LogState> emit) async {
+  Future<void> _onAddToiletLog(
+    AddToiletLog event,
+    Emitter<LogState> emit,
+  ) async {
     final newLog = Log(
       id: DateTime.now().millisecondsSinceEpoch,
       timestamp: DateTime.now(),
@@ -65,7 +77,9 @@ class LogBloc extends Bloc<LogEvent, LogState> {
   }
 
   Future<void> _onUpdateLog(UpdateLog event, Emitter<LogState> emit) async {
-    final updatedLogs = state.logs.map((log) => log.id == event.log.id ? event.log : log).toList();
+    final updatedLogs = state.logs
+        .map((log) => log.id == event.log.id ? event.log : log)
+        .toList();
     emit(state.copyWith(logs: updatedLogs));
     await _storageService.saveLogs(updatedLogs);
   }
@@ -76,9 +90,22 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     await _storageService.saveLogs(updatedLogs);
   }
 
-  Future<void> _onClearAllLogs(ClearAllLogs event, Emitter<LogState> emit) async {
+  Future<void> _onClearAllLogs(
+    ClearAllLogs event,
+    Emitter<LogState> emit,
+  ) async {
     emit(state.copyWith(logs: []));
     await _storageService.saveLogs([]);
+  }
+
+  Future<void> _onUpdateSettings(
+    UpdateSettings event,
+    Emitter<LogState> emit,
+  ) async {
+    final newTheme = event.theme ?? state.theme;
+    final newGoal = event.goal ?? state.dailyGoal;
+    emit(state.copyWith(theme: newTheme, dailyGoal: newGoal));
+    await _storageService.saveSettings({'theme': newTheme, 'goal': newGoal});
   }
 
   void _onUpdateTime(UpdateTime event, Emitter<LogState> emit) {
