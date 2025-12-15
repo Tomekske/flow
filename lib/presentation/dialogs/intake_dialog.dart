@@ -33,18 +33,35 @@ class _IntakeDialogState extends State<IntakeDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.existingLog != null ? "Edit Intake" : "Log Fluids", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            Text(
+              widget.existingLog != null ? "Edit Intake" : "Log Fluids",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ),
             const SizedBox(height: 24),
 
-            const Text("Type", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+            Text(
+              "Type",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark ? Colors.grey[400] : const Color(0xFF64748B),
+              ),
+            ),
             const SizedBox(height: 12),
             GridView.count(
               crossAxisCount: 4,
@@ -57,16 +74,37 @@ class _IntakeDialogState extends State<IntakeDialog> {
                   onTap: () => setState(() => _selectedType = t['id']),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue.shade50 : Colors.grey.shade50,
+                      color: isSelected
+                          ? (isDark
+                                ? Colors.blue.withOpacity(0.2)
+                                : Colors.blue.shade50)
+                          : (isDark ? Colors.grey[800] : Colors.grey.shade50),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: isSelected ? Colors.blue : Colors.transparent, width: 2),
+                      border: Border.all(
+                        color: isSelected ? Colors.blue : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(t['icon'], color: isSelected ? Colors.blue : Colors.grey.shade400),
+                        Icon(
+                          t['icon'],
+                          color: isSelected
+                              ? (isDark ? Colors.blueAccent : Colors.blue)
+                              : (isDark ? Colors.grey : Colors.grey.shade400),
+                        ),
                         const SizedBox(height: 4),
-                        Text(t['label'], style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isSelected ? Colors.blue : Colors.grey.shade400)),
+                        Text(
+                          t['label'],
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected
+                                ? (isDark ? Colors.blueAccent : Colors.blue)
+                                : (isDark ? Colors.grey : Colors.grey.shade400),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -76,7 +114,14 @@ class _IntakeDialogState extends State<IntakeDialog> {
 
             const SizedBox(height: 24),
 
-            const Text("Volume (ml)", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+            Text(
+              "Volume (ml)",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark ? Colors.grey[400] : const Color(0xFF64748B),
+              ),
+            ),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
@@ -85,15 +130,38 @@ class _IntakeDialogState extends State<IntakeDialog> {
                 return GestureDetector(
                   onTap: () => setState(() => _selectedVolume = vol),
                   child: Container(
-                    width: 70,
+                    width: 60,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF1F5F9),
+                      color: isSelected
+                          ? const Color(0xFF2563EB)
+                          : (isDark
+                                ? Colors.grey[800]
+                                : const Color(0xFFF1F5F9)),
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: isSelected ? [BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 4, offset: const Offset(0, 2))] : [],
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: Colors.blue.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : [],
                     ),
                     alignment: Alignment.center,
-                    child: Text('$vol', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF64748B))),
+                    child: Text(
+                      '+$vol',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark
+                                  ? Colors.grey[400]
+                                  : const Color(0xFF64748B)),
+                      ),
+                    ),
                   ),
                 );
               }).toList(),
@@ -106,22 +174,50 @@ class _IntakeDialogState extends State<IntakeDialog> {
                 Expanded(
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: const Text("Cancel", style: TextStyle(color: Color(0xFF64748B))),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(
+                        color: isDark
+                            ? Colors.grey[400]
+                            : const Color(0xFF64748B),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context, {'type': _selectedType, 'volume': _selectedVolume});
+                      Navigator.pop(context, {
+                        'type': _selectedType,
+                        'volume': _selectedVolume,
+                      });
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0),
-                    child: const Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

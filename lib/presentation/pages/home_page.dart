@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
   Future<void> _showToiletDialog(BuildContext context) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => const ToiletDialog(),
+      builder: (context) => ToiletDialog(),
     );
     if (result != null && context.mounted) {
       context.read<LogBloc>().add(
