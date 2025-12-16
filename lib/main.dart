@@ -7,6 +7,8 @@ import 'data/repositories/shared_preferences_repository.dart';
 import 'presentation/main_screen.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   try {
     // Initialize dependencies
     final prefs = await SharedPreferences.getInstance();

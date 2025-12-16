@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import '../models/log.dart';
 import '../repositories/shared_preferences_repository.dart';
@@ -24,6 +24,7 @@ class StorageService {
     try {
       return _repository.loadLogs();
     } catch (e) {
+      debugPrint('Failed to load logs: $e');
       return [];
     }
   }
@@ -41,6 +42,7 @@ class StorageService {
     try {
       return _repository.loadSettings();
     } catch (e) {
+      debugPrint('Failed to load settings: $e');
       // Return defaults on error
       return {'theme': 'light', 'goal': 2.0};
     }
