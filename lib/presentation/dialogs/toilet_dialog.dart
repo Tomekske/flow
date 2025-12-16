@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/log.dart';
 
 class ToiletDialog extends StatefulWidget {
-  final Log? existingLog;
+  final ToiletLog? existingLog;
   const ToiletDialog({super.key, this.existingLog});
 
   @override
@@ -90,7 +90,7 @@ class _ToiletDialogState extends State<ToiletDialog> {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: Colors.blue.withOpacity(0.3),
+                                    color: Colors.blue.withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -159,7 +159,7 @@ class _ToiletDialogState extends State<ToiletDialog> {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
+                                    color: Colors.black.withValues(alpha: 0.05),
                                     blurRadius: 2,
                                   ),
                                 ]
