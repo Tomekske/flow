@@ -42,10 +42,10 @@ class ClearAllLogs extends LogEvent {}
 
 class UpdateSettings extends LogEvent {
   final String? theme;
-  final double? goal;
-  const UpdateSettings({this.theme, this.goal});
+  final double? drinkingGoal;
+  const UpdateSettings({this.theme, this.drinkingGoal});
   @override
-  List<Object> get props => [theme ?? '', goal ?? 0];
+  List<Object> get props => [theme ?? '', drinkingGoal ?? 0];
 }
 
 class UpdateTime extends LogEvent {}

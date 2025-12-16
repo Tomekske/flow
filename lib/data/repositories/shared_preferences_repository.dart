@@ -9,11 +9,6 @@ import '../models/log.dart';
 /// It acts as the "Source of Truth" for data stored on the device.
 class SharedPreferencesRepository {
   static const String _storageKey = 'flowtrack_logs';
-  static const String _settingsKey = 'flowtrack_settings';
-  static const Map<String, dynamic> _defaultSettings = {
-    'theme': 'light',
-    'goal': 2.0,
-  };
 
   final SharedPreferences _prefs;
 
@@ -52,27 +47,5 @@ class SharedPreferencesRepository {
       // Log error or rethrow with context
       rethrow;
     }
-  }
-
-  /// Retrieves application settings (e.g., theme, daily goals).
-  ///
-  /// Returns a Map of key-value pairs.
-  /// If no settings are found on disk, it returns a default map:
-  /// `{'theme': 'light', 'goal': 2.0}`.
-  Future<Map<String, dynamic>> loadSettings() async {
-    final String? settingsJson = _prefs.getString(_settingsKey);
-
-    if (settingsJson != null) {
-      return jsonDecode(settingsJson);
-    }
-
-    return Map<String, dynamic>.from(_defaultSettings);
-  }
-
-  /// Persists the application [settings] map to local storage.
-  ///
-  /// The map is JSON-encoded before saving.
-  Future<void> saveSettings(Map<String, dynamic> settings) async {
-    await _prefs.setString(_settingsKey, jsonEncode(settings));
   }
 }
