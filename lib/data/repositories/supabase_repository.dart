@@ -43,10 +43,10 @@ class SupabaseRepository {
     }
   }
 
-  /// Persists a list of [Log] entries to local storage.
+  /// /// Persists application settings to Supabase.
   ///
-  /// The [logs] list is converted to a JSON string before being saved.
-  /// This overwrites any previously stored logs.
+  /// Upserts the settings record (id=1) with the provided [theme] and [drinkingGoal].
+  /// The updated_at timestamp is automatically set to the current time.
   Future<void> saveSettings(String theme, double drinkingGoal) async {
     await _client.from('settings').upsert({
       'id': 1,
