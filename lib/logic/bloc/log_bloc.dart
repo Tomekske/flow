@@ -51,10 +51,10 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     AddToiletLog event,
     Emitter<LogState> emit,
   ) async {
-    final newLog = Log(
+    final newLog = ToiletLog(
       id: DateTime.now().millisecondsSinceEpoch,
       timestamp: DateTime.now(),
-      type: 'toilet',
+      // type: 'toilet',
       urineColor: event.color,
       urineAmount: event.amount,
     );
@@ -64,10 +64,10 @@ class LogBloc extends Bloc<LogEvent, LogState> {
   }
 
   Future<void> _onAddFluidLog(AddFluidLog event, Emitter<LogState> emit) async {
-    final newLog = Log(
+    final newLog = DrinkLog(
       id: DateTime.now().millisecondsSinceEpoch,
       timestamp: DateTime.now(),
-      type: 'intake',
+      // type: 'intake',
       fluidType: event.fluidType,
       volume: event.volume,
     );

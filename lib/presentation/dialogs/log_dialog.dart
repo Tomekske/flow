@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/log.dart';
 
 class LogDialog extends StatefulWidget {
-  final Log? existingLog;
+  final ToiletLog? existingLog;
   const LogDialog({super.key, this.existingLog});
 
   @override
@@ -44,10 +44,24 @@ class _LogDialogState extends State<LogDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.existingLog != null ? "Edit Log" : "Log Visit", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            Text(
+              widget.existingLog != null ? "Edit Log" : "Log Visit",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B),
+              ),
+            ),
             const SizedBox(height: 24),
 
-            const Text("Color", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+            const Text(
+              "Color",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF64748B),
+              ),
+            ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,17 +73,48 @@ class _LogDialogState extends State<LogDialog> {
                   child: Column(
                     children: [
                       Container(
-                        width: 40, height: 40,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: Color(colorVal),
                           shape: BoxShape.circle,
-                          border: Border.all(color: isSelected ? Colors.blue : Colors.grey.shade300, width: isSelected ? 3 : 1),
-                          boxShadow: isSelected ? [BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.blue
+                                : Colors.grey.shade300,
+                            width: isSelected ? 3 : 1,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.blue.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                              : [],
                         ),
-                        child: isSelected ? const Icon(Icons.check, size: 20, color: Colors.black54) : null,
+                        child: isSelected
+                            ? const Icon(
+                                Icons.check,
+                                size: 20,
+                                color: Colors.black54,
+                              )
+                            : null,
                       ),
                       const SizedBox(height: 4),
-                      Text(c['label'], style: TextStyle(fontSize: 10, color: isSelected ? Colors.blue : const Color(0xFF94A3B8), fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                      Text(
+                        c['label'],
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isSelected
+                              ? Colors.blue
+                              : const Color(0xFF94A3B8),
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -78,11 +123,21 @@ class _LogDialogState extends State<LogDialog> {
 
             const SizedBox(height: 24),
 
-            const Text("Amount", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+            const Text(
+              "Amount",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF64748B),
+              ),
+            ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Row(
                 children: _amounts.map((amount) {
                   final bool isSelected = _selectedAmount == amount;
@@ -91,9 +146,29 @@ class _LogDialogState extends State<LogDialog> {
                       onTap: () => setState(() => _selectedAmount = amount),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(color: isSelected ? Colors.white : Colors.transparent, borderRadius: BorderRadius.circular(8), boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2)] : []),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.white : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 2,
+                                  ),
+                                ]
+                              : [],
+                        ),
                         alignment: Alignment.center,
-                        child: Text(amount, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? const Color(0xFF1E293B) : const Color(0xFF64748B))),
+                        child: Text(
+                          amount,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected
+                                ? const Color(0xFF1E293B)
+                                : const Color(0xFF64748B),
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -108,22 +183,46 @@ class _LogDialogState extends State<LogDialog> {
                 Expanded(
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: const Text("Cancel", style: TextStyle(color: Color(0xFF64748B))),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(color: Color(0xFF64748B)),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context, {'color': _selectedColor, 'amount': _selectedAmount});
+                      Navigator.pop(context, {
+                        'color': _selectedColor,
+                        'amount': _selectedAmount,
+                      });
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B82F6), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0),
-                    child: const Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3B82F6),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

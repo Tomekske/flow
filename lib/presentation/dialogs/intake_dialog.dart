@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/log.dart';
 
 class IntakeDialog extends StatefulWidget {
-  final Log? existingLog;
+  final DrinkLog? existingLog;
   const IntakeDialog({super.key, this.existingLog});
 
   @override

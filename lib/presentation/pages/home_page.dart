@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../data/models/log.dart';
 import '../../helpers/stats_helper.dart';
 import '../../logic/bloc/log_bloc.dart';
 import '../dialogs/toilet_dialog.dart';
@@ -52,17 +53,16 @@ class HomePage extends StatelessWidget {
         final logs = state.logs;
         final now = state.now;
         final todayStr = DateFormat('yyyy-MM-dd').format(now);
+
         final todayLogs = logs
             .where(
               (l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == todayStr,
             )
             .toList();
 
-        // Toilet Metrics
-        final toiletLogs = logs.where((l) => l.type == 'toilet');
-        final todayToiletCount = todayLogs
-            .where((l) => l.type == 'toilet')
-            .length;
+        // --- Toilet Metrics ---
+        final toiletLogs = logs.whereType<ToiletLog>().toList();
+        final todayToiletCount = todayLogs.whereType<ToiletLog>().length;
         final lastToilet = toiletLogs.isNotEmpty ? toiletLogs.first : null;
         final lastToiletTime = lastToilet != null
             ? DateFormat('HH:mm').format(lastToilet.timestamp)
@@ -76,11 +76,13 @@ class HomePage extends StatelessWidget {
             ? dailyStats['rate']!
             : globalStats['rate']!;
 
-        // Intake Metrics
-        final intakeLogs = logs.where((l) => l.type == 'intake');
-        final todayIntakeVol = todayLogs
-            .where((l) => l.type == 'intake')
-            .fold(0, (sum, l) => sum + (l.volume ?? 0));
+        // --- Intake Metrics ---
+        final intakeLogs = logs.whereType<DrinkLog>().toList();
+        final todayIntakeVol = todayLogs.whereType<DrinkLog>().fold(
+          0,
+          (sum, l) => sum + (l.volume ?? 0),
+        );
+
         final lastIntake = intakeLogs.isNotEmpty ? intakeLogs.first : null;
         final lastIntakeTime = lastIntake != null
             ? DateFormat('HH:mm').format(lastIntake.timestamp)
@@ -88,7 +90,10 @@ class HomePage extends StatelessWidget {
 
         final goalLiters = state.dailyGoal;
         final currentLiters = todayIntakeVol / 1000.0;
-        final progress = (currentLiters / goalLiters).clamp(0.0, 1.0);
+        // Clamp progress to prevent bar overflow if goal is exceeded
+        final progress = (goalLiters > 0)
+            ? (currentLiters / goalLiters).clamp(0.0, 1.0)
+            : 0.0;
 
         return Padding(
           padding: const EdgeInsets.all(24.0),
