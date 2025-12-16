@@ -1,39 +1,62 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
+
 import '../models/log.dart';
+import '../repositories/shared_preferences_repository.dart';
 
+/// A service that acts as the bridge between the application's domain logic
+/// and the data layer ([SharedPreferencesRepository]).
+///
+/// This class handles business rules for data storage, such as error handling
+/// and validation (e.g., preventing empty saves), ensuring the UI interacts
+/// with a clean API regardless of the underlying storage method.
 class StorageService {
-  static const String _storageKey = 'flowtrack_logs';
-  static const String _settingsKey = 'flowtrack_settings';
+  final SharedPreferencesRepository _repository;
 
+  /// Creates a [StorageService] requiring a [_repository] instance.
+  StorageService(this._repository);
+
+  /// Retrieves the list of [Log] entries safely.
+  ///
+  /// This method wraps the repository call in a try-catch block.
+  /// If an error occurs during data retrieval (e.g., corruption),
+  /// it gracefully returns an empty list `[]` instead of crashing the app.
   Future<List<Log>> loadLogs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? logsJson = prefs.getString(_storageKey);
-    if (logsJson != null) {
-      final List<dynamic> decoded = jsonDecode(logsJson);
-      return decoded.map((item) => Log.fromJson(item)).toList();
+    try {
+      return _repository.loadLogs();
+    } catch (e) {
+      debugPrint('Failed to load logs: $e');
+      return [];
     }
-    return [];
   }
 
+  /// Delegates directly to the repository to persist the [logs] list.
+  /// Accepts empty lists, allowing intentional clearing of all logs.
   Future<void> saveLogs(List<Log> logs) async {
-    final prefs = await SharedPreferences.getInstance();
-    final String encoded = jsonEncode(logs.map((e) => e.toJson()).toList());
-    await prefs.setString(_storageKey, encoded);
+    await _repository.saveLogs(logs);
   }
 
-  // --- Settings ---
+  /// Retrieves the current application settings.
+  ///
+  /// Delegates directly to the repository to fetch the settings map.
   Future<Map<String, dynamic>> loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? settingsJson = prefs.getString(_settingsKey);
-    if (settingsJson != null) {
-      return jsonDecode(settingsJson);
+    try {
+      return _repository.loadSettings();
+    } catch (e) {
+      debugPrint('Failed to load settings: $e');
+      // Return defaults on error
+      return {'theme': 'light', 'goal': 2.0};
     }
-    return {'theme': 'light', 'goal': 2.0}; // Defaults
   }
 
+  /// Saves the updated application [settings].
+  ///
+  /// Persists the provided map to storage via the repository.
   Future<void> saveSettings(Map<String, dynamic> settings) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_settingsKey, jsonEncode(settings));
+    try {
+      await _repository.saveSettings(settings);
+    } catch (e) {
+      debugPrint('Failed to save settings: $e');
+      rethrow;
+    }
   }
 }
