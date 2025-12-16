@@ -11,9 +11,9 @@ import 'presentation/main_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Config.load();
-
   try {
+    await Config.load();
+
     // Initialize dependencies
     final prefs = await SharedPreferences.getInstance();
     final localRepo = SharedPreferencesRepository(prefs);

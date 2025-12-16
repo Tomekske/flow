@@ -5,7 +5,7 @@ import '../models/log.dart';
 import '../repositories/shared_preferences_repository.dart';
 
 /// A service that acts as the bridge between the application's domain logic
-/// and the data layer ([SharedPreferencesRepository]).
+/// and the data layer ([SharedPreferencesRepository] and [SupabaseRepository]).
 ///
 /// This class handles business rules for data storage, such as error handling
 /// and validation (e.g., preventing empty saves), ensuring the UI interacts
@@ -14,7 +14,7 @@ class StorageService {
   final SharedPreferencesRepository _localRepo;
   final SupabaseRepository _remoteRepo;
 
-  /// Creates a [StorageService] requiring a [_repository] instance.
+  /// Creates a [StorageService] requiring local and remote repository instances.
   StorageService(this._localRepo, this._remoteRepo);
 
   /// Retrieves the list of [Log] entries safely.
@@ -55,9 +55,18 @@ class StorageService {
   /// Persists the provided map to storage via the repository.
   Future<void> saveSettings(Map<String, dynamic> settings) async {
     try {
-      final theme = settings['theme'] as String;
-      final drinkingGoal = (settings['drinking_goal'] as num).toDouble();
-      await _remoteRepo.saveSettings(theme, drinkingGoal);
+      final theme = settings['theme'] as String?;
+      final drinkingGoal = settings['drinking_goal'] as num?;
+
+      if (theme == null || theme.isEmpty) {
+        throw ArgumentError('Theme is required and cannot be empty');
+      }
+
+      if (drinkingGoal == null || drinkingGoal <= 0) {
+        throw ArgumentError('Drinking goal must be a positive number');
+      }
+
+      await _remoteRepo.saveSettings(theme, drinkingGoal.toDouble());
     } catch (e) {
       debugPrint('Failed to save settings: $e');
       rethrow;

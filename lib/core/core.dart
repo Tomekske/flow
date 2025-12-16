@@ -25,7 +25,7 @@ class Config {
     final envFile = envType == 'prd' ? '.env.prd' : '.env.dev';
 
     if (kDebugMode) {
-      print('Loading Config: [$envType] from $envFile');
+      debugPrint('Loading Config: [$envType] from $envFile');
     }
 
     // Load ENV File
@@ -37,9 +37,18 @@ class Config {
 
     // Init Supabase
     try {
+      final supabaseUrl = dotenv.env['SUPABASE_URL'];
+      final supabaseKey = dotenv.env['SUPABASE_ANON_KEY'];
+
+      if (supabaseUrl == null || supabaseKey == null) {
+        throw Exception(
+          'Missing required env variables: SUPABASE_URL or SUPABASE_ANON_KEY',
+        );
+      }
+
       await Supabase.initialize(
-        url: dotenv.env['SUPABASE_URL']!,
-        anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+        url: supabaseUrl,
+        anonKey: supabaseKey,
       );
     } catch (e) {
       throw Exception('Supabase connection failed: $e');

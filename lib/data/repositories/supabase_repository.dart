@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseRepository {
@@ -9,11 +10,11 @@ class SupabaseRepository {
     }
   }
 
-  /// Retrieves application settings (e.g., theme, daily goals).
+  /// Retrieves application settings (e.g., theme, daily drinking goals).
   ///
   /// Returns a Map of key-value pairs.
   /// If no settings are found on disk, it returns a default map:
-  /// `{'theme': 'light', 'goal': 2.0}`.
+  /// `{'theme': 'light', 'drinking_goal': 2.0}`.
   Future<Map<String, dynamic>> loadSettings() async {
     try {
       final data = await _client
@@ -34,10 +35,10 @@ class SupabaseRepository {
 
       return {
         'theme': data['theme'],
-        'goal': (data['drinking_goal'] as num).toDouble(),
+        'drinking_goal': (data['drinking_goal'] as num).toDouble(),
       };
     } catch (e) {
-      print('Error loading settings from Supabase: $e');
+      debugPrint('Error loading settings from Supabase: $e');
       rethrow;
     }
   }
