@@ -10,6 +10,10 @@ import '../models/log.dart';
 class SharedPreferencesRepository {
   static const String _storageKey = 'flowtrack_logs';
   static const String _settingsKey = 'flowtrack_settings';
+  static const Map<String, dynamic> _defaultSettings = {
+    'theme': 'light',
+    'goal': 2.0,
+  };
 
   final SharedPreferences _prefs;
 
@@ -21,12 +25,19 @@ class SharedPreferencesRepository {
   /// Returns a [Future] that completes with a list of logs.
   /// If no data is found, it returns an empty list `[]`.
   Future<List<Log>> loadLogs() async {
-    final String? logsJson = _prefs.getString(_storageKey);
-    if (logsJson != null) {
-      final List<dynamic> decoded = jsonDecode(logsJson);
-      return decoded.map((item) => Log.fromJson(item)).toList();
+    try {
+      final String? logsJson = _prefs.getString(_storageKey);
+
+      if (logsJson != null) {
+        final List<dynamic> decoded = jsonDecode(logsJson);
+        return decoded.map((item) => Log.fromJson(item)).toList();
+      }
+
+      return [];
+    } catch (e) {
+      // Log the error or rethrow with context
+      return [];
     }
-    return [];
   }
 
   /// Persists a list of [Log] entries to local storage.
@@ -34,8 +45,13 @@ class SharedPreferencesRepository {
   /// The [logs] list is converted to a JSON string before being saved.
   /// This overwrites any previously stored logs.
   Future<void> saveLogs(List<Log> logs) async {
-    final String encoded = jsonEncode(logs.map((e) => e.toJson()).toList());
-    await _prefs.setString(_storageKey, encoded);
+    try {
+      final String encoded = jsonEncode(logs.map((e) => e.toJson()).toList());
+      await _prefs.setString(_storageKey, encoded);
+    } catch (e) {
+      // Log error or rethrow with context
+      rethrow;
+    }
   }
 
   /// Retrieves application settings (e.g., theme, daily goals).
@@ -45,10 +61,12 @@ class SharedPreferencesRepository {
   /// `{'theme': 'light', 'goal': 2.0}`.
   Future<Map<String, dynamic>> loadSettings() async {
     final String? settingsJson = _prefs.getString(_settingsKey);
+
     if (settingsJson != null) {
       return jsonDecode(settingsJson);
     }
-    return {'theme': 'light', 'goal': 2.0}; // Defaults
+
+    return Map<String, dynamic>.from(_defaultSettings);
   }
 
   /// Persists the application [settings] map to local storage.

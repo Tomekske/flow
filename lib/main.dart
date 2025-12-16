@@ -29,12 +29,10 @@ class FlowTrackApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use RepositoryProvider.value because the service is already created
     return RepositoryProvider.value(
       value: storageService,
       child: BlocProvider(
         create: (context) => LogBloc(
-          // This works the same way: it reads the service we just provided
           storageService: context.read<StorageService>(),
         ),
         child: MaterialApp(
@@ -44,9 +42,7 @@ class FlowTrackApp extends StatelessWidget {
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
               seedColor: const Color(0xFF3B82F6),
-              background: const Color(
-                0xFFF0F4F8,
-              ), // Note: 'background' is deprecated in newer Flutter; consider 'surface'
+              surface: const Color(0xFFF0F4F8),
             ),
             fontFamily: 'Roboto',
           ),

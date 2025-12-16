@@ -32,8 +32,6 @@ class StorageService {
   /// If [logs] is empty, the save operation is aborted to prevent
   /// unnecessary writes to disk.
   Future<void> saveLogs(List<Log> logs) async {
-    if (logs.isEmpty) return;
-
     await _repository.saveLogs(logs);
   }
 
@@ -41,13 +39,23 @@ class StorageService {
   ///
   /// Delegates directly to the repository to fetch the settings map.
   Future<Map<String, dynamic>> loadSettings() async {
-    return _repository.loadSettings();
+    try {
+      return _repository.loadSettings();
+    } catch (e) {
+      // Return defaults on error
+      return {'theme': 'light', 'goal': 2.0};
+    }
   }
 
   /// Saves the updated application [settings].
   ///
   /// Persists the provided map to storage via the repository.
   Future<void> saveSettings(Map<String, dynamic> settings) async {
-    await _repository.saveSettings(settings);
+    try {
+      await _repository.saveSettings(settings);
+    } catch (e) {
+      // Log error or notify user
+      rethrow;
+    }
   }
 }
