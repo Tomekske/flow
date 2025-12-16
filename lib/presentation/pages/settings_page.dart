@@ -146,7 +146,10 @@ class SettingsScreen extends StatelessWidget {
                             IconButton(
                               onPressed: () => context.read<LogBloc>().add(
                                 UpdateSettings(
-                                  goal: (state.dailyGoal - 0.1).clamp(0.5, 5.0),
+                                  drinkingGoal: (state.dailyGoal - 0.1).clamp(
+                                    0.5,
+                                    5.0,
+                                  ),
                                 ),
                               ),
                               icon: const Icon(Icons.remove_circle_outline),
@@ -154,7 +157,10 @@ class SettingsScreen extends StatelessWidget {
                             IconButton(
                               onPressed: () => context.read<LogBloc>().add(
                                 UpdateSettings(
-                                  goal: (state.dailyGoal + 0.1).clamp(0.5, 5.0),
+                                  drinkingGoal: (state.dailyGoal + 0.1).clamp(
+                                    0.5,
+                                    5.0,
+                                  ),
                                 ),
                               ),
                               icon: const Icon(
@@ -173,7 +179,7 @@ class SettingsScreen extends StatelessWidget {
                       divisions: 45,
                       activeColor: Colors.blue,
                       onChanged: (val) => context.read<LogBloc>().add(
-                        UpdateSettings(goal: val),
+                        UpdateSettings(drinkingGoal: val),
                       ),
                     ),
                   ],

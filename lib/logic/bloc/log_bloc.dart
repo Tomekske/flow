@@ -39,7 +39,7 @@ class LogBloc extends Bloc<LogEvent, LogState> {
           status: LogStatus.success,
           logs: logs,
           theme: settings['theme'],
-          dailyGoal: settings['goal'],
+          dailyGoal: settings['drinking_goal'],
         ),
       );
     } catch (_) {
@@ -103,9 +103,12 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     Emitter<LogState> emit,
   ) async {
     final newTheme = event.theme ?? state.theme;
-    final newGoal = event.goal ?? state.dailyGoal;
+    final newGoal = event.drinkingGoal ?? state.dailyGoal;
     emit(state.copyWith(theme: newTheme, dailyGoal: newGoal));
-    await _storageService.saveSettings({'theme': newTheme, 'goal': newGoal});
+    await _storageService.saveSettings({
+      'theme': newTheme,
+      'drinking_goal': newGoal,
+    });
   }
 
   void _onUpdateTime(UpdateTime event, Emitter<LogState> emit) {
