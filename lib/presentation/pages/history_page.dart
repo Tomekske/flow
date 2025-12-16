@@ -11,25 +11,38 @@ class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
   Future<void> _showEditDialog(BuildContext context, Log log) async {
+    Widget dialog;
+    if (log is ToiletLog) {
+      dialog = ToiletDialog(existingLog: log);
+    } else if (log is DrinkLog) {
+      dialog = IntakeDialog(existingLog: log);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unknown log type')),
+      );
+      return;
+    }
+
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => log is ToiletLog
-          ? ToiletDialog(existingLog: log as ToiletLog)
-          : IntakeDialog(existingLog: log as DrinkLog),
+      builder: (context) => dialog,
     );
 
     if (result != null && context.mounted) {
       Log updatedLog;
+
       if (log is ToiletLog) {
         updatedLog = log.copyWith(
           urineColor: result['color'],
           urineAmount: result['amount'],
         );
-      } else {
-        updatedLog = (log as DrinkLog).copyWith(
+      } else if (log is DrinkLog) {
+        updatedLog = log.copyWith(
           fluidType: result['type'],
           volume: result['volume'],
         );
+      } else {
+        return;
       }
 
       context.read<LogBloc>().add(UpdateLog(updatedLog));
@@ -80,13 +93,14 @@ class HistoryScreen extends StatelessWidget {
                             confirmColor: Colors.red,
                           );
                           if (confirm == true) {
-                            if (context.mounted)
+                            if (context.mounted) {
                               context.read<LogBloc>().add(ClearAllLogs());
+                            }
                           }
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: isDark
-                              ? Colors.red.withOpacity(0.2)
+                              ? Colors.red.withValues(alpha: 0.2)
                               : const Color(0xFFFEF2F2),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -116,14 +130,14 @@ class HistoryScreen extends StatelessWidget {
                   indicatorSize: TabBarIndicatorSize.tab,
                   indicator: BoxDecoration(
                     color: isDark
-                        ? Colors.blueAccent.withOpacity(0.4)
+                        ? Colors.blueAccent.withValues(alpha: 0.4)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: isDark
                         ? []
                         : [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 2,
                             ),
                           ],
@@ -195,7 +209,7 @@ class HistoryScreen extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -211,10 +225,10 @@ class HistoryScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isToilet
                       ? (isDark
-                            ? Colors.amber.withOpacity(0.2)
+                            ? Colors.amber.withValues(alpha: 0.2)
                             : Colors.amber.shade50)
                       : (isDark
-                            ? Colors.blue.withOpacity(0.2)
+                            ? Colors.blue.withValues(alpha: 0.2)
                             : Colors.blue.shade50),
                   shape: BoxShape.circle,
                 ),
@@ -233,9 +247,11 @@ class HistoryScreen extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          isToilet
+                          log is ToiletLog
                               ? "Toilet Visit"
-                              : (log as DrinkLog).fluidType ?? "Unknown",
+                              : log is DrinkLog
+                              ? log.fluidType ?? "Unknown"
+                              : "Unknown",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -253,16 +269,16 @@ class HistoryScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isToilet
                                 ? (isDark
-                                      ? Colors.amber.withOpacity(0.2)
+                                      ? Colors.amber.withValues(alpha: 0.2)
                                       : Colors.amber.shade50)
                                 : (isDark
-                                      ? Colors.blue.withOpacity(0.2)
+                                      ? Colors.blue.withValues(alpha: 0.2)
                                       : Colors.blue.shade50),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             isToilet
-                                ? ((log as ToiletLog).urineAmount ?? '?')
+                                ? (log.urineAmount ?? '?')
                                 : '+${(log as DrinkLog).volume}ml',
                             style: TextStyle(
                               fontSize: 10,
@@ -310,8 +326,9 @@ class HistoryScreen extends StatelessWidget {
                     confirmColor: Colors.red,
                   );
                   if (confirm == true) {
-                    if (context.mounted)
+                    if (context.mounted) {
                       context.read<LogBloc>().add(DeleteLog(log.id));
+                    }
                   }
                 },
                 icon: Icon(

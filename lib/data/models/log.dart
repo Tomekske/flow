@@ -3,12 +3,10 @@ enum LogType { toilet, drink }
 abstract class Log {
   final int id;
   final DateTime timestamp;
-  final String type;
 
   const Log({
     required this.id,
     required this.timestamp,
-    required this.type,
   });
 
   Map<String, dynamic> toJson();
@@ -31,17 +29,16 @@ class ToiletLog extends Log {
   final String? urineAmount;
 
   const ToiletLog({
-    required int id,
-    required DateTime timestamp,
+    required super.id,
+    required super.timestamp,
     this.urineColor,
     this.urineAmount,
-  }) : super(id: id, timestamp: timestamp, type: 'toilet');
+  });
 
   @override
   Map<String, dynamic> toJson() => {
     'id': id,
     'timestamp': timestamp.toIso8601String(),
-    'type': type,
     'urineColor': urineColor,
     'urineAmount': urineAmount,
   };
@@ -73,17 +70,16 @@ class DrinkLog extends Log {
   final int? volume; // ml
 
   const DrinkLog({
-    required int id,
-    required DateTime timestamp,
+    required super.id,
+    required super.timestamp,
     this.fluidType,
     this.volume,
-  }) : super(id: id, timestamp: timestamp, type: 'drink');
+  });
 
   @override
   Map<String, dynamic> toJson() => {
     'id': id,
     'timestamp': timestamp.toIso8601String(),
-    'type': type,
     'fluidType': fluidType,
     'volume': volume,
   };

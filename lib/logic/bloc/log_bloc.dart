@@ -54,7 +54,6 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     final newLog = ToiletLog(
       id: DateTime.now().millisecondsSinceEpoch,
       timestamp: DateTime.now(),
-      // type: 'toilet',
       urineColor: event.color,
       urineAmount: event.amount,
     );
@@ -67,7 +66,6 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     final newLog = DrinkLog(
       id: DateTime.now().millisecondsSinceEpoch,
       timestamp: DateTime.now(),
-      // type: 'intake',
       fluidType: event.fluidType,
       volume: event.volume,
     );
