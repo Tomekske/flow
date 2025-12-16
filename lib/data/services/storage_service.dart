@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../models/log.dart';
 import '../repositories/shared_preferences_repository.dart';
 
@@ -26,11 +28,8 @@ class StorageService {
     }
   }
 
-  /// Saves a list of [Log] entries if valid.
-  ///
-  /// Includes business logic to check if the [logs] list is empty.
-  /// If [logs] is empty, the save operation is aborted to prevent
-  /// unnecessary writes to disk.
+  /// Delegates directly to the repository to persist the [logs] list.
+  /// Accepts empty lists, allowing intentional clearing of all logs.
   Future<void> saveLogs(List<Log> logs) async {
     await _repository.saveLogs(logs);
   }
@@ -54,7 +53,7 @@ class StorageService {
     try {
       await _repository.saveSettings(settings);
     } catch (e) {
-      // Log error or notify user
+      debugPrint('Failed to save settings: $e');
       rethrow;
     }
   }
