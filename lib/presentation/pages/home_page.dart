@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/drink_log.dart';
 import '../../helpers/stats_helper.dart';
 import '../../logic/bloc/log_bloc.dart';
 import '../dialogs/urine_dialog.dart';
@@ -17,7 +16,11 @@ class HomePage extends StatelessWidget {
     );
     if (result != null && context.mounted) {
       context.read<LogBloc>().add(
-        AddUrineLogEvent(color: result['color'], amount: result['amount']),
+        AddUrineLogEvent(
+          color: result['color'],
+          amount: result['amount'],
+          createdAt: result['created_at'],
+        ),
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -35,7 +38,11 @@ class HomePage extends StatelessWidget {
     );
     if (result != null && context.mounted) {
       context.read<LogBloc>().add(
-        AddDrinkLogEvent(fluidType: result['type'], volume: result['volume']),
+        AddDrinkLogEvent(
+          fluidType: result['type'],
+          volume: result['volume'],
+          createdAt: result['created_at'],
+        ),
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

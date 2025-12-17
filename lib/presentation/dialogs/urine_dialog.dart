@@ -1,5 +1,6 @@
 import 'package:flow/data/models/urine_log.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../data/enums/urine_color.dart';
 
@@ -14,6 +15,7 @@ class UrineDialog extends StatefulWidget {
 class _UrineDialogState extends State<UrineDialog> {
   UrineColor _selectedColor = UrineColor.yellow;
   String _selectedAmount = 'Medium';
+  late DateTime _selectedTime;
 
   final List<String> _amounts = ['Small', 'Medium', 'Large'];
 
@@ -23,7 +25,36 @@ class _UrineDialogState extends State<UrineDialog> {
     if (widget.existingLog != null) {
       _selectedColor = widget.existingLog!.color;
       _selectedAmount = widget.existingLog!.amount;
+      _selectedTime = widget.existingLog!.createdAt;
+    } else {
+      _selectedTime = DateTime.now();
     }
+  }
+
+  Future<void> _pickDateTime(BuildContext context) async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (date == null) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_selectedTime),
+    );
+    if (time == null) return;
+
+    setState(() {
+      _selectedTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    });
   }
 
   @override
@@ -51,6 +82,58 @@ class _UrineDialogState extends State<UrineDialog> {
             ),
             const SizedBox(height: 24),
 
+            // Date Time Picker
+            Text(
+              "Time",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark ? Colors.grey[400] : const Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _pickDateTime(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.transparent
+                        : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat(
+                        'yyyy-MM-dd - HH:mm',
+                      ).format(_selectedTime),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF334155),
+                      ),
+                    ),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 16,
+                      color: isDark
+                          ? Colors.grey[400]
+                          : const Color(0xFF64748B),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
             Text(
               "Color",
               style: TextStyle(
@@ -62,13 +145,9 @@ class _UrineDialogState extends State<UrineDialog> {
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              // Iterate over the Enum values directly
               children: UrineColor.values.map((option) {
-                // Compare Enums directly
                 final bool isSelected = _selectedColor == option;
-
                 return GestureDetector(
-                  // Update state with the Enum object
                   onTap: () => setState(() => _selectedColor = option),
                   child: Column(
                     children: [
@@ -76,7 +155,6 @@ class _UrineDialogState extends State<UrineDialog> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          // Access the color getter from your Enum
                           color: option.color,
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -105,7 +183,6 @@ class _UrineDialogState extends State<UrineDialog> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        // Access the label field from your Enum
                         option.label,
                         style: TextStyle(
                           fontSize: 10,
@@ -216,6 +293,7 @@ class _UrineDialogState extends State<UrineDialog> {
                       Navigator.pop(context, {
                         'color': _selectedColor,
                         'amount': _selectedAmount,
+                        'created_at': _selectedTime,
                       });
                     },
                     style: ElevatedButton.styleFrom(
