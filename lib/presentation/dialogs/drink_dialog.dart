@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
 import '../../data/models/drink_log.dart';
 
 class DrinkDialog extends StatefulWidget {
@@ -13,6 +13,7 @@ class DrinkDialog extends StatefulWidget {
 class _DrinkDialogState extends State<DrinkDialog> {
   String _selectedType = 'Water';
   int _selectedVolume = 250;
+  late DateTime _selectedTime;
 
   final List<Map<String, dynamic>> _types = [
     {'id': 'Water', 'icon': Icons.water_drop, 'label': 'Water'},
@@ -27,9 +28,44 @@ class _DrinkDialogState extends State<DrinkDialog> {
   void initState() {
     super.initState();
     if (widget.existingLog != null) {
-      _selectedType = widget.existingLog!.fluidType ?? 'Water';
-      _selectedVolume = widget.existingLog!.volume ?? 250;
+      _selectedType = widget.existingLog!.fluidType;
+      _selectedVolume = widget.existingLog!.volume;
+      _selectedTime = widget.existingLog!.createdAt;
+    } else {
+      _selectedTime = DateTime.now();
     }
+  }
+
+  Future<void> _pickDateTime(BuildContext context) async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (date == null) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_selectedTime),
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+    if (time == null) return;
+
+    setState(() {
+      _selectedTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    });
   }
 
   @override
@@ -46,11 +82,63 @@ class _DrinkDialogState extends State<DrinkDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.existingLog != null ? "Edit Intake" : "Log Fluids",
+              widget.existingLog != null ? "Edit Drink" : "Log Drink",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Date Time Picker
+            Text(
+              "Time",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark ? Colors.grey[400] : const Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _pickDateTime(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.transparent
+                        : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat(
+                        'yyyy-MM-dd - HH:mm',
+                      ).format(_selectedTime),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF334155),
+                      ),
+                    ),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 16,
+                      color: isDark
+                          ? Colors.grey[400]
+                          : const Color(0xFF64748B),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -198,6 +286,7 @@ class _DrinkDialogState extends State<DrinkDialog> {
                       Navigator.pop(context, {
                         'type': _selectedType,
                         'volume': _selectedVolume,
+                        'created_at': _selectedTime,
                       });
                     },
                     style: ElevatedButton.styleFrom(

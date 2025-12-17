@@ -105,7 +105,7 @@ class LogBloc extends Bloc<LogEvent, LogState> {
       }
       final newLog = UrineLog(
         id: 0,
-        createdAt: DateTime.now(),
+        createdAt: event.createdAt,
         color: event.color!,
         amount: event.amount!,
       );
@@ -127,7 +127,7 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     try {
       final newLog = DrinkLog(
         id: 0,
-        createdAt: DateTime.now(),
+        createdAt: event.createdAt,
         fluidType: event.fluidType,
         volume: event.volume,
       );

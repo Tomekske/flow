@@ -34,12 +34,14 @@ class HistoryScreen extends StatelessWidget {
         UrineLog updatedUrineLog = log.copyWith(
           color: result['color'],
           amount: result['amount'],
+          createdAt: result['created_at'],
         );
         context.read<LogBloc>().add(UpdateUrineLogEvent(updatedUrineLog));
       } else if (log is DrinkLog) {
         DrinkLog updatedDrinkLog = log.copyWith(
           fluidType: result['type'],
           volume: result['volume'],
+          createdAt: result['created_at'],
         );
         context.read<LogBloc>().add(UpdateDrinkLogEvent(updatedDrinkLog));
       }

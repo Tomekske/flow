@@ -11,17 +11,31 @@ class LoadData extends LogEvent {}
 class AddUrineLogEvent extends LogEvent {
   final UrineColor? color;
   final String? amount;
-  const AddUrineLogEvent({this.color, this.amount});
+  final DateTime createdAt;
+
+  const AddUrineLogEvent({
+    this.color,
+    this.amount,
+    required this.createdAt,
+  });
+
   @override
-  List<Object?> get props => [color, amount];
+  List<Object?> get props => [color, amount, createdAt];
 }
 
 class AddDrinkLogEvent extends LogEvent {
   final String fluidType;
   final int volume;
-  const AddDrinkLogEvent({required this.fluidType, required this.volume});
+  final DateTime createdAt;
+
+  const AddDrinkLogEvent({
+    required this.fluidType,
+    required this.volume,
+    required this.createdAt,
+  });
+
   @override
-  List<Object> get props => [fluidType, volume];
+  List<Object> get props => [fluidType, volume, createdAt];
 }
 
 class UpdateUrineLogEvent extends LogEvent {

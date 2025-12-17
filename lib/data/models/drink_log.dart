@@ -1,13 +1,13 @@
 class DrinkLog {
   final int id;
-  final String? fluidType; // Water, Soda, Tea, Soup
-  final int? volume; // ml
+  final String fluidType; // Water, Soda, Tea, Soup
+  final int volume; // ml
   final DateTime createdAt;
 
   const DrinkLog({
     required this.id,
-    this.fluidType,
-    this.volume,
+    required this.fluidType,
+    required this.volume,
     required this.createdAt,
   });
 
@@ -20,8 +20,11 @@ class DrinkLog {
 
   factory DrinkLog.fromJson(Map<String, dynamic> json) {
     try {
-      if (json['id'] == null || json['created_at'] == null) {
-        throw ArgumentError('Missing required fields: id or created_at');
+      if (json['id'] == null ||
+          json['created_at'] == null ||
+          json['fluid_type'] == null ||
+          json['volume'] == null) {
+        throw ArgumentError('Missing required fields in DrinkLog JSON');
       }
 
       return DrinkLog(
