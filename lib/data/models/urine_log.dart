@@ -13,7 +13,6 @@ class UrineLog {
     required this.amount,
   });
 
-  @override
   Map<String, dynamic> toJson() => {
     'id': id,
     'color': color.index,
@@ -21,14 +20,22 @@ class UrineLog {
     'created_at': createdAt.toIso8601String(),
   };
 
-  factory UrineLog.fromJson(Map<String, dynamic> json) => UrineLog(
-    id: json['id'],
-    // Convert DB integer back to Enum
-    color: UrineColor.fromId(json['color']),
-    amount: json['amount'],
-    createdAt: DateTime.parse(json['created_at']),
-  );
+  factory UrineLog.fromJson(Map<String, dynamic> json) {
+    try {
+      if (json['id'] == null || json['created_at'] == null) {
+        throw ArgumentError('Missing required fields: id or created_at');
+      }
 
+      return UrineLog(
+        id: json['id'],
+        color: UrineColor.fromId(json['color']),
+        amount: json['amount'],
+        createdAt: DateTime.parse(json['created_at']),
+      );
+    } catch (e) {
+      throw FormatException('Failed to parse UrineLog from JSON: $e');
+    }
+  }
   UrineLog copyWith({
     int? id,
     UrineColor? color,

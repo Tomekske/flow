@@ -20,6 +20,10 @@ enum UrineColor {
 
   // Safe way to get Enum from database ID (int)
   static UrineColor fromId(int id) {
+    // Ensure the ID is within the valid range
+    if (id < 0 || id >= UrineColor.values.length) {
+      throw ArgumentError('Invalid UrineColor id: $id');
+    }
     return UrineColor.values[id];
   }
 }

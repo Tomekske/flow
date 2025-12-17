@@ -3,7 +3,7 @@ part of 'log_bloc.dart';
 enum LogStatus { initial, loading, success, failure }
 
 class LogState extends Equatable {
-  // Contains both UrineLog and DrinkLog objects, sorted by date
+  // Separate lists for urine and drink logs, each sorted by date
   final List<UrineLog> urineLogs;
   final List<DrinkLog> drinkLogs;
   final DateTime now;

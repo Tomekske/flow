@@ -83,7 +83,7 @@ class HomePage extends StatelessWidget {
             : globalStats['rate']!;
 
         // --- Intake Metrics ---
-        final todayDrinkVol = todayDrinkLogs.whereType<DrinkLog>().fold(
+        final todayDrinkVol = todayDrinkLogs.fold(
           0,
           (sum, l) => sum + (l.volume ?? 0),
         );

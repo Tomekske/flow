@@ -11,7 +11,6 @@ class DrinkLog {
     required this.createdAt,
   });
 
-  @override
   Map<String, dynamic> toJson() => {
     'id': id,
     'fluid_type': fluidType,
@@ -19,12 +18,22 @@ class DrinkLog {
     'created_at': createdAt.toIso8601String(),
   };
 
-  factory DrinkLog.fromJson(Map<String, dynamic> json) => DrinkLog(
-    id: json['id'],
-    createdAt: DateTime.parse(json['created_at']),
-    fluidType: json['fluid_type'],
-    volume: json['volume'],
-  );
+  factory DrinkLog.fromJson(Map<String, dynamic> json) {
+    try {
+      if (json['id'] == null || json['created_at'] == null) {
+        throw ArgumentError('Missing required fields: id or created_at');
+      }
+
+      return DrinkLog(
+        id: json['id'],
+        createdAt: DateTime.parse(json['created_at']),
+        fluidType: json['fluid_type'],
+        volume: json['volume'],
+      );
+    } catch (e) {
+      throw FormatException('Failed to parse DrinkLog from JSON: $e');
+    }
+  }
 
   DrinkLog copyWith({
     int? id,

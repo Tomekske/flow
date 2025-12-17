@@ -60,8 +60,8 @@ class HistoryScreen extends StatelessWidget {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         // Filter lists for each tab
-        final urineLogs = state.urineLogs.whereType<UrineLog>().toList();
-        final drinkLogs = state.drinkLogs.whereType<DrinkLog>().toList();
+        final urineLogs = state.urineLogs;
+        final drinkLogs = state.drinkLogs;
 
         return DefaultTabController(
           length: 2,
@@ -261,7 +261,7 @@ class HistoryScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "${DateFormat('yyyy-MM-d').format(log.createdAt)} • ${DateFormat('HH:mm').format(log.createdAt)}",
+                      "${DateFormat('yyyy-MM-dd').format(log.createdAt)} • ${DateFormat('HH:mm').format(log.createdAt)}",
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark

@@ -155,11 +155,16 @@ class SupabaseRepository {
   /// Upserts the settings record (id=1) with the provided [theme] and [drinkingGoal].
   /// The updated_at timestamp is automatically set to the current time.
   Future<void> saveSettings(String theme, double drinkingGoal) async {
-    await _client.from('settings').upsert({
-      'id': 1,
-      'theme': theme,
-      'drinking_goal': drinkingGoal,
-      'updated_at': DateTime.now().toIso8601String(),
-    });
+    try {
+      await _client.from('settings').upsert({
+        'id': 1,
+        'theme': theme,
+        'drinking_goal': drinkingGoal,
+        'updated_at': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      debugPrint('Error saving settings: $e');
+      rethrow;
+    }
   }
 }

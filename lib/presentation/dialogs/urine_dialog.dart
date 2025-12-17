@@ -12,7 +12,7 @@ class UrineDialog extends StatefulWidget {
 }
 
 class _UrineDialogState extends State<UrineDialog> {
-  UrineColor _selectedColor = UrineColor.values[2];
+  UrineColor _selectedColor = UrineColor.yellow;
   String _selectedAmount = 'Medium';
 
   final List<String> _amounts = ['Small', 'Medium', 'Large'];

@@ -19,14 +19,13 @@ class StatsHelper {
     // 3. Calculate Interval (Moving Average of time between visits)
     final double avgInterval = calculateAverageInterval(
       sortedLogs,
-      DateTime.now(),
+      now ?? DateTime.now(),
     );
 
     // 4. Format Output
     return {
       'rate': rate.toStringAsFixed(2),
       'interval': avgInterval.toStringAsFixed(2),
-      // 'interval': "0.0",
     };
   }
 
@@ -58,8 +57,10 @@ class StatsHelper {
 
     // Guard rails for division
     if (hoursDiff < 0.01) hoursDiff = 0.01;
-    if (now == null && hoursDiff < 1)
-      hoursDiff = 1; // Minimum 1 hour window for global stats
+    if (now == null && hoursDiff < 1) {
+      // Minimum 1 hour window for global stats
+      hoursDiff = 1;
+    }
 
     return sortedLogs.length / hoursDiff;
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../data/enums/urine_color.dart';
@@ -39,8 +40,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
       await _storageService.initialize();
       add(LoadData());
     } catch (e) {
-      // Handle init error if necessary
-      print("Startup error: $e");
+      emit(state.copyWith(status: LogStatus.failure));
+      debugPrint("Startup error: $e");
     }
   }
 
@@ -53,7 +54,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
       // If not, you need to add it to StorageService and SupabaseRepository.
       await _storageService.updateUrineLog(event.log);
       add(LoadData());
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to update urine log: $e');
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
@@ -66,7 +68,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
       // Assuming StorageService has an updateDrinkLog method.
       await _storageService.updateDrinkLog(event.log);
       add(LoadData());
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to update drink log: $e');
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
@@ -88,7 +91,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
           dailyGoal: settings['drinking_goal'],
         ),
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to load data: $e');
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
@@ -98,7 +102,10 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     Emitter<LogState> emit,
   ) async {
     try {
-      // Create log with placeholder ID (Repo handles ID)
+      if (event.color == null || event.amount == null) {
+        emit(state.copyWith(status: LogStatus.failure));
+        return;
+      }
       final newLog = UrineLog(
         id: 0,
         createdAt: DateTime.now(),
@@ -110,7 +117,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
 
       // Reload to get the correct ID and sorted list from DB
       add(LoadData());
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to add an urine log: $e');
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
@@ -129,7 +137,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
 
       await _storageService.addDrinkLog(newLog);
       add(LoadData());
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to add a drink log: $e');
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
@@ -141,7 +150,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     try {
       await _storageService.deleteUrineLog(event.id);
       add(LoadData());
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to delete an urine log: $e');
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
@@ -153,7 +163,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     try {
       await _storageService.deleteDrinkLog(event.id);
       add(LoadData());
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to delete a drink log: $e');
       emit(state.copyWith(status: LogStatus.failure));
     }
   }
@@ -162,6 +173,8 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     UpdateSettings event,
     Emitter<LogState> emit,
   ) async {
+    final previousTheme = state.theme;
+    final previousGoal = state.dailyGoal;
     final newTheme = event.theme ?? state.theme;
     final newGoal = event.drinkingGoal ?? state.dailyGoal;
 
@@ -172,8 +185,15 @@ class LogBloc extends Bloc<LogEvent, LogState> {
         'theme': newTheme,
         'drinking_goal': newGoal,
       });
-    } catch (_) {
-      emit(state.copyWith(status: LogStatus.failure));
+    } catch (e) {
+      debugPrint('Failed to update settings: $e');
+      emit(
+        state.copyWith(
+          status: LogStatus.failure,
+          theme: previousTheme,
+          dailyGoal: previousGoal,
+        ),
+      );
     }
   }
 
