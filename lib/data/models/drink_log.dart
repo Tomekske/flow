@@ -24,7 +24,7 @@ class DrinkLog {
           json['created_at'] == null ||
           json['fluid_type'] == null ||
           json['volume'] == null) {
-        throw ArgumentError('Missing required fields: id or created_at');
+        throw ArgumentError('Missing required fields in DrinkLog JSON');
       }
 
       return DrinkLog(
