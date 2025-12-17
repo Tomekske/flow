@@ -1,13 +1,13 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flow/data/models/urine_log.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/log.dart';
 
 class ChartWidget extends StatelessWidget {
-  final List<Log> logs;
+  final List<UrineLog> urineLogs;
   final String period; // hourly, weekly, monthly
 
-  const ChartWidget({super.key, required this.logs, required this.period});
+  const ChartWidget({super.key, required this.urineLogs, required this.period});
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +16,8 @@ class ChartWidget extends StatelessWidget {
 
     if (period == 'hourly') {
       final hours = List.generate(24, (i) => 0);
-      for (var log in logs) {
-        hours[log.timestamp.hour]++;
+      for (var log in urineLogs) {
+        hours[log.createdAt.hour]++;
       }
       barGroups = List.generate(24, (i) {
         if (hours[i] > maxY) maxY = hours[i].toDouble();
@@ -38,9 +38,9 @@ class ChartWidget extends StatelessWidget {
       for (int i = 6; i >= 0; i--) {
         final d = now.subtract(Duration(days: i));
         final dayStr = DateFormat('yyyy-MM-dd').format(d);
-        final count = logs
+        final count = urineLogs
             .where(
-              (l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == dayStr,
+              (l) => DateFormat('yyyy-MM-dd').format(l.createdAt) == dayStr,
             )
             .length;
         if (count > maxY) maxY = count.toDouble();
@@ -64,9 +64,9 @@ class ChartWidget extends StatelessWidget {
       for (int i = 29; i >= 0; i--) {
         final d = now.subtract(Duration(days: i));
         final dayStr = DateFormat('yyyy-MM-dd').format(d);
-        final count = logs
+        final count = urineLogs
             .where(
-              (l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == dayStr,
+              (l) => DateFormat('yyyy-MM-dd').format(l.createdAt) == dayStr,
             )
             .length;
         if (count > maxY) maxY = count.toDouble();

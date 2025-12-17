@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../data/models/log.dart';
 
-class IntakeDialog extends StatefulWidget {
+import '../../data/models/drink_log.dart';
+
+class DrinkDialog extends StatefulWidget {
   final DrinkLog? existingLog;
-  const IntakeDialog({super.key, this.existingLog});
+  const DrinkDialog({super.key, this.existingLog});
 
   @override
-  State<IntakeDialog> createState() => _IntakeDialogState();
+  State<DrinkDialog> createState() => _DrinkDialogState();
 }
 
-class _IntakeDialogState extends State<IntakeDialog> {
+class _DrinkDialogState extends State<DrinkDialog> {
   String _selectedType = 'Water';
   int _selectedVolume = 250;
 
@@ -76,7 +77,7 @@ class _IntakeDialogState extends State<IntakeDialog> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? (isDark
-                                ? Colors.blue.withOpacity(0.2)
+                                ? Colors.blue.withValues(alpha: 0.2)
                                 : Colors.blue.shade50)
                           : (isDark ? Colors.grey[800] : Colors.grey.shade50),
                       borderRadius: BorderRadius.circular(12),
@@ -142,7 +143,7 @@ class _IntakeDialogState extends State<IntakeDialog> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: Colors.blue.withOpacity(0.3),
+                                color: Colors.blue.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),

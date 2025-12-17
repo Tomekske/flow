@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import '../../logic/bloc/log_bloc.dart';
-import '../../helpers/stats_helper.dart';
 import '../widgets/chart_widget.dart';
-import '../widgets/frequency_card.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -20,19 +17,8 @@ class _StatsScreenState extends State<StatsScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<LogBloc, LogState>(
       builder: (context, state) {
-        final logs = state.logs;
-        final now = state.now;
+        final urineLogs = state.urineLogs;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-
-        final todayStr = DateFormat('yyyy-MM-dd').format(now);
-        final todayLogs = logs
-            .where(
-              (l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == todayStr,
-            )
-            .toList();
-
-        final dailyStats = StatsHelper.calculateStats(todayLogs, now: now);
-        final globalStats = StatsHelper.calculateStats(logs, now: null);
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -73,7 +59,9 @@ class _StatsScreenState extends State<StatsScreen> {
                             boxShadow: isSelected
                                 ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
                                       blurRadius: 2,
                                     ),
                                   ]
@@ -118,7 +106,7 @@ class _StatsScreenState extends State<StatsScreen> {
                         : const Color(0xFFF1F5F9),
                   ),
                 ),
-                child: ChartWidget(logs: logs, period: _chartPeriod),
+                child: ChartWidget(urineLogs: urineLogs, period: _chartPeriod),
               ),
             ],
           ),

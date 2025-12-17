@@ -1,58 +1,113 @@
-import 'package:flow/data/repositories/supabase_repository.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flow/data/repositories/supabase_repository.dart';
 
-import '../models/log.dart';
-import '../repositories/shared_preferences_repository.dart';
+import '../models/drink_log.dart';
+import '../models/urine_log.dart';
 
-/// A service that acts as the bridge between the application's domain logic
-/// and the data layer ([SharedPreferencesRepository] and [SupabaseRepository]).
-///
-/// This class handles business rules for data storage, such as error handling
-/// and validation (e.g., preventing empty saves), ensuring the UI interacts
-/// with a clean API regardless of the underlying storage method.
 class StorageService {
-  final SharedPreferencesRepository _localRepo;
   final SupabaseRepository _remoteRepo;
 
-  /// Creates a [StorageService] requiring local and remote repository instances.
-  StorageService(this._localRepo, this._remoteRepo);
+  StorageService(this._remoteRepo);
 
-  /// Retrieves the list of [Log] entries safely.
-  ///
-  /// This method wraps the repository call in a try-catch block.
-  /// If an error occurs during data retrieval (e.g., corruption),
-  /// it gracefully returns an empty list `[]` instead of crashing the app.
-  Future<List<Log>> loadLogs() async {
+  /// Ensures the user is authenticated (anonymously) before making requests.
+  Future<void> initialize() async {
     try {
-      return _localRepo.loadLogs();
+      await _remoteRepo.initializeUser();
     } catch (e) {
-      debugPrint('Failed to load logs: $e');
+      debugPrint('Failed to initialize Supabase user: $e');
+      rethrow;
+    }
+  }
+
+  /// Retrieves the list of UrineLogs from Supabase.
+  Future<List<UrineLog>> loadUrineLogs() async {
+    try {
+      return await _remoteRepo.getUrineLogs();
+    } catch (e) {
+      debugPrint('Failed to load urine logs: $e');
+      // Return empty list on error so UI doesn't break
       return [];
     }
   }
 
-  /// Delegates directly to the repository to persist the [logs] list.
-  /// Accepts empty lists, allowing intentional clearing of all logs.
-  Future<void> saveLogs(List<Log> logs) async {
-    await _localRepo.saveLogs(logs);
+  /// Adds a single UrineLog to the database.
+  Future<void> addUrineLog(UrineLog log) async {
+    try {
+      await _remoteRepo.addUrineLog(log);
+    } catch (e) {
+      debugPrint('Failed to add urine log: $e');
+      rethrow;
+    }
   }
 
-  /// Retrieves the current application settings.
-  ///
-  /// Delegates directly to the repository to fetch the settings map.
+  /// Deletes a specific UrineLog by ID.
+  Future<void> deleteUrineLog(int id) async {
+    try {
+      await _remoteRepo.deleteUrineLog(id);
+    } catch (e) {
+      debugPrint('Failed to delete urine log: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateUrineLog(UrineLog log) async {
+    try {
+      await _remoteRepo.updateUrineLog(log);
+    } catch (e) {
+      debugPrint('Failed to update urine log: $e');
+      rethrow;
+    }
+  }
+
+  /// Retrieves the list of DrinkLogs from Supabase.
+  Future<List<DrinkLog>> loadDrinkLogs() async {
+    try {
+      return await _remoteRepo.getDrinkLogs();
+    } catch (e) {
+      debugPrint('Failed to load drink logs: $e');
+      return [];
+    }
+  }
+
+  /// Adds a single DrinkLog to the database.
+  Future<void> addDrinkLog(DrinkLog log) async {
+    try {
+      await _remoteRepo.addDrinkLog(log);
+    } catch (e) {
+      debugPrint('Failed to add drink log: $e');
+      rethrow;
+    }
+  }
+
+  /// Deletes a specific DrinkLog by ID.
+  Future<void> deleteDrinkLog(int id) async {
+    try {
+      await _remoteRepo.deleteDrinkLog(id);
+    } catch (e) {
+      debugPrint('Failed to delete drink log: $e');
+      rethrow;
+    }
+  }
+
+  /// Updates an existing DrinkLog in the database.
+  Future<void> updateDrinkLog(DrinkLog log) async {
+    try {
+      await _remoteRepo.updateDrinkLog(log);
+    } catch (e) {
+      debugPrint('Failed to update drink log: $e');
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> loadSettings() async {
     try {
-      return _remoteRepo.loadSettings();
+      return await _remoteRepo.loadSettings();
     } catch (e) {
       debugPrint('Failed to load settings: $e');
-      // Return defaults on error
       return {'theme': 'light', 'drinking_goal': 2.0};
     }
   }
 
-  /// Saves the updated application [settings].
-  ///
-  /// Persists the provided map to storage via the repository.
   Future<void> saveSettings(Map<String, dynamic> settings) async {
     try {
       final theme = settings['theme'] as String?;

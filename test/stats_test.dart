@@ -1,12 +1,7 @@
-import 'package:flow/data/models/log.dart';
+import 'package:flow/data/enums/urine_color.dart';
+import 'package:flow/data/models/urine_log.dart';
 import 'package:flow/helpers/stats_helper.dart';
 import 'package:test/test.dart';
-// TODO: Import your actual stats_helper.dart and log.dart files
-// import 'package:your_app/utils/stats_helper.dart';
-// import 'package:your_app/data/models/log.dart';
-
-// ------------------------------------------------
-// ----------------------------------------------------------------------
 
 void main() {
   group('IntervalHelper Mapping Tests', () {
@@ -171,41 +166,131 @@ void main() {
     test('Calculates average time between logs correctly', () {
       final logs = [
         [
-          ToiletLog(timestamp: time(0, 15), id: 1),
-          ToiletLog(timestamp: time(0, 30), id: 2),
+          UrineLog(
+            createdAt: time(0, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(0, 30),
+            id: 2,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
         ],
         [
           // Interval 1
-          ToiletLog(timestamp: time(0, 15), id: 1),
-          ToiletLog(timestamp: time(0, 30), id: 2),
+          UrineLog(
+            createdAt: time(0, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(0, 30),
+            id: 2,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
 
           // Interval 2
-          ToiletLog(timestamp: time(1, 15), id: 1),
-          ToiletLog(timestamp: time(1, 30), id: 2),
+          UrineLog(
+            createdAt: time(1, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(1, 30),
+            id: 2,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
         ],
         [
           // Interval 1
-          ToiletLog(timestamp: time(0, 15), id: 1),
-          ToiletLog(timestamp: time(0, 30), id: 2),
+          UrineLog(
+            createdAt: time(0, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(0, 30),
+            id: 2,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
 
           // Interval 2
-          ToiletLog(timestamp: time(1, 15), id: 1),
-          ToiletLog(timestamp: time(1, 30), id: 2),
-          ToiletLog(timestamp: time(2, 15), id: 3),
+          UrineLog(
+            createdAt: time(1, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(1, 30),
+            id: 2,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(2, 15),
+            id: 3,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
 
           // Interval 3
-          ToiletLog(timestamp: time(2, 15), id: 1),
+          UrineLog(
+            createdAt: time(2, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
         ],
         [
           // Interval 1
-          ToiletLog(timestamp: time(0, 15), id: 1),
-          ToiletLog(timestamp: time(0, 30), id: 2),
-          ToiletLog(timestamp: time(2, 15), id: 1),
+          UrineLog(
+            createdAt: time(0, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(0, 30),
+            id: 2,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(2, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
 
           // Interval 2
-          ToiletLog(timestamp: time(1, 15), id: 1),
-          ToiletLog(timestamp: time(1, 30), id: 2),
-          ToiletLog(timestamp: time(2, 15), id: 3),
+          UrineLog(
+            createdAt: time(1, 15),
+            id: 1,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(1, 30),
+            id: 2,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
+          UrineLog(
+            createdAt: time(2, 15),
+            id: 3,
+            color: UrineColor.clear,
+            amount: 'Medium',
+          ),
         ],
       ];
 

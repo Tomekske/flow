@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/core.dart';
 import 'data/repositories/supabase_repository.dart';
 import 'logic/bloc/log_bloc.dart';
 import 'data/services/storage_service.dart';
-import 'data/repositories/shared_preferences_repository.dart';
 import 'presentation/main_screen.dart';
 
 Future<void> main() async {
@@ -15,20 +13,19 @@ Future<void> main() async {
     await Config.load();
 
     // Initialize dependencies
-    final prefs = await SharedPreferences.getInstance();
-    final localRepo = SharedPreferencesRepository(prefs);
     final remoteRepo = SupabaseRepository();
-    final service = StorageService(localRepo, remoteRepo);
+    final service = StorageService(remoteRepo);
 
     // Pass the initialized service to the App
     runApp(FlowTrackApp(storageService: service));
   } catch (e) {
-    // Show error UI or fallback
+    debugPrint('Failed to initialize app: $e');
+
     runApp(
       MaterialApp(
         home: Scaffold(
           body: Center(
-            child: Text('Failed to initialize app: $e'),
+            child: Text('Failed to initialize app. Please try again later.'),
           ),
         ),
       ),
