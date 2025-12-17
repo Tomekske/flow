@@ -50,8 +50,6 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     Emitter<LogState> emit,
   ) async {
     try {
-      // Assuming StorageService has an updateUrineLog method.
-      // If not, you need to add it to StorageService and SupabaseRepository.
       await _storageService.updateUrineLog(event.log);
       add(LoadData());
     } catch (e) {
@@ -65,7 +63,6 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     Emitter<LogState> emit,
   ) async {
     try {
-      // Assuming StorageService has an updateDrinkLog method.
       await _storageService.updateDrinkLog(event.log);
       add(LoadData());
     } catch (e) {

@@ -75,11 +75,9 @@ class StatsHelper {
       return 0.0;
     }
 
-    final intervalMap = Map.fromIterable(
-      List.generate(24, (index) => index + 1), // Generates [1, 2, ..., 24]
-      key: (item) => item, // Use the number as the Key
-      value: (_) => <DateTime>[], // Initialize with empty list for timestamps
-    );
+    final intervalMap = {
+      for (int i = 1; i <= 24; i++) i: <DateTime>[],
+    };
 
     for (var log in sortedLogs) {
       var interval = getInterval(log.createdAt);

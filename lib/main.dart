@@ -15,17 +15,17 @@ Future<void> main() async {
     // Initialize dependencies
     final remoteRepo = SupabaseRepository();
     final service = StorageService(remoteRepo);
-    await service.initialize();
 
     // Pass the initialized service to the App
     runApp(FlowTrackApp(storageService: service));
   } catch (e) {
-    // Show error UI or fallback
+    debugPrint('Failed to initialize app: $e');
+
     runApp(
       MaterialApp(
         home: Scaffold(
           body: Center(
-            child: Text('Failed to initialize app: $e'),
+            child: Text('Failed to initialize app. Please try again later.'),
           ),
         ),
       ),
