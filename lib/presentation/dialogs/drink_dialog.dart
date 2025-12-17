@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/drink_log.dart';
 
@@ -16,12 +17,14 @@ class _DrinkDialogState extends State<DrinkDialog> {
   late DateTime _selectedTime;
 
   final List<Map<String, dynamic>> _types = [
-    {'id': 'Water', 'icon': Icons.water_drop, 'label': 'Water'},
-    {'id': 'Soda', 'icon': Icons.local_drink, 'label': 'Soda'},
-    {'id': 'Tea', 'icon': Icons.coffee, 'label': 'Tea'},
-    {'id': 'Soup', 'icon': Icons.soup_kitchen, 'label': 'Soup'},
+    {'id': 'Water', 'icon': Icons.water_drop_rounded, 'label': 'Water'},
+    {'id': 'Soda', 'icon': FontAwesomeIcons.burger, 'label': 'Soda'},
+    {'id': 'Milk', 'icon': FontAwesomeIcons.cow, 'label': 'Milk'},
+    {'id': 'Juice', 'icon': FontAwesomeIcons.appleWhole, 'label': 'Juice'},
+    {'id': 'Soup', 'icon': Icons.soup_kitchen_rounded, 'label': 'Soup'},
+    {'id': 'Tea', 'icon': Icons.emoji_food_beverage_rounded, 'label': 'Tea'},
+    {'id': 'Alcohol', 'icon': Icons.liquor_rounded, 'label': 'Alcohol'},
   ];
-
   final List<int> _volumes = [200, 250, 330, 500];
 
   @override
@@ -177,12 +180,25 @@ class _DrinkDialogState extends State<DrinkDialog> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          t['icon'],
-                          color: isSelected
-                              ? (isDark ? Colors.blueAccent : Colors.blue)
-                              : (isDark ? Colors.grey : Colors.grey.shade400),
-                        ),
+                        t['icon'] is IconData
+                            ? Icon(
+                                t['icon'],
+                                color: isSelected
+                                    ? (isDark ? Colors.blueAccent : Colors.blue)
+                                    : (isDark
+                                          ? Colors.grey
+                                          : Colors.grey.shade400),
+                              )
+                            : FaIcon(
+                                t['icon'],
+                                size:
+                                    20, // FaIcons can sometimes be slightly larger/smaller
+                                color: isSelected
+                                    ? (isDark ? Colors.blueAccent : Colors.blue)
+                                    : (isDark
+                                          ? Colors.grey
+                                          : Colors.grey.shade400),
+                              ),
                         const SizedBox(height: 4),
                         Text(
                           t['label'],
