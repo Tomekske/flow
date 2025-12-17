@@ -1,21 +1,22 @@
+import 'package:flow/data/models/urine_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../data/models/drink_log.dart';
 import '../../logic/bloc/log_bloc.dart';
-import '../../data/models/log.dart';
 import '../dialogs/confirm_dialog.dart';
-import '../dialogs/toilet_dialog.dart';
-import '../dialogs/intake_dialog.dart';
+import '../dialogs/urine_dialog.dart';
+import '../dialogs/drink_dialog.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
-  Future<void> _showEditDialog(BuildContext context, Log log) async {
+  Future<void> _showEditDialog(BuildContext context, dynamic log) async {
     Widget dialog;
-    if (log is ToiletLog) {
-      dialog = ToiletDialog(existingLog: log);
+    if (log is UrineLog) {
+      dialog = UrineDialog(existingLog: log);
     } else if (log is DrinkLog) {
-      dialog = IntakeDialog(existingLog: log);
+      dialog = DrinkDialog(existingLog: log);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Unknown log type')),
@@ -29,23 +30,20 @@ class HistoryScreen extends StatelessWidget {
     );
 
     if (result != null && context.mounted) {
-      Log updatedLog;
-
-      if (log is ToiletLog) {
-        updatedLog = log.copyWith(
-          urineColor: result['color'],
-          urineAmount: result['amount'],
+      if (log is UrineLog) {
+        UrineLog updatedUrineLog = log.copyWith(
+          color: result['color'],
+          amount: result['amount'],
         );
+        context.read<LogBloc>().add(UpdateUrineLogEvent(updatedUrineLog));
       } else if (log is DrinkLog) {
-        updatedLog = log.copyWith(
+        DrinkLog updatedDrinkLog = log.copyWith(
           fluidType: result['type'],
           volume: result['volume'],
         );
-      } else {
-        return;
+        context.read<LogBloc>().add(UpdateDrinkLogEvent(updatedDrinkLog));
       }
 
-      context.read<LogBloc>().add(UpdateLog(updatedLog));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Log updated!'),
@@ -62,8 +60,8 @@ class HistoryScreen extends StatelessWidget {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         // Filter lists for each tab
-        final toiletLogs = state.logs.whereType<ToiletLog>().toList();
-        final consumptionLogs = state.logs.whereType<DrinkLog>().toList();
+        final urineLogs = state.urineLogs.whereType<UrineLog>().toList();
+        final drinkLogs = state.drinkLogs.whereType<DrinkLog>().toList();
 
         return DefaultTabController(
           length: 2,
@@ -82,40 +80,6 @@ class HistoryScreen extends StatelessWidget {
                         color: isDark ? Colors.white : const Color(0xFF1E293B),
                       ),
                     ),
-                    if (state.logs.isNotEmpty)
-                      TextButton(
-                        onPressed: () async {
-                          final confirm = await showConfirmDialog(
-                            context,
-                            title: "Clear All?",
-                            content: "This cannot be undone.",
-                            confirmText: "Clear All",
-                            confirmColor: Colors.red,
-                          );
-                          if (confirm == true) {
-                            if (context.mounted) {
-                              context.read<LogBloc>().add(ClearAllLogs());
-                            }
-                          }
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: isDark
-                              ? Colors.red.withValues(alpha: 0.2)
-                              : const Color(0xFFFEF2F2),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: Text(
-                          "Clear All",
-                          style: TextStyle(
-                            color: isDark ? Colors.redAccent : Colors.red,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -156,8 +120,8 @@ class HistoryScreen extends StatelessWidget {
               Expanded(
                 child: TabBarView(
                   children: [
-                    _buildLogList(context, toiletLogs, isDark),
-                    _buildLogList(context, consumptionLogs, isDark),
+                    _buildLogList(context, urineLogs, isDark),
+                    _buildLogList(context, drinkLogs, isDark),
                   ],
                 ),
               ),
@@ -168,7 +132,7 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogList(BuildContext context, List<Log> logs, bool isDark) {
+  Widget _buildLogList(BuildContext context, List<dynamic> logs, bool isDark) {
     if (logs.isEmpty) {
       return Center(
         child: Column(
@@ -196,7 +160,7 @@ class HistoryScreen extends StatelessWidget {
       itemCount: logs.length,
       itemBuilder: (ctx, index) {
         final log = logs[index];
-        final isToilet = log is ToiletLog;
+        final isToilet = log is UrineLog;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -247,7 +211,7 @@ class HistoryScreen extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          log is ToiletLog
+                          log is UrineLog
                               ? "Toilet Visit"
                               : log is DrinkLog
                               ? log.fluidType ?? "Unknown"
@@ -278,7 +242,7 @@ class HistoryScreen extends StatelessWidget {
                           ),
                           child: Text(
                             isToilet
-                                ? (log.urineAmount ?? '?')
+                                ? (log.amount ?? '?')
                                 : '+${(log as DrinkLog).volume}ml',
                             style: TextStyle(
                               fontSize: 10,
@@ -297,7 +261,7 @@ class HistoryScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "${DateFormat('MMM dd').format(log.timestamp)} • ${DateFormat('hh:mm a').format(log.timestamp)}",
+                      "${DateFormat('yyyy-MM-d').format(log.createdAt)} • ${DateFormat('HH:mm').format(log.createdAt)}",
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark
@@ -327,7 +291,11 @@ class HistoryScreen extends StatelessWidget {
                   );
                   if (confirm == true) {
                     if (context.mounted) {
-                      context.read<LogBloc>().add(DeleteLog(log.id));
+                      if (log is UrineLog) {
+                        context.read<LogBloc>().add(DeleteUrineLog(log.id));
+                      } else {
+                        context.read<LogBloc>().add(DeleteDrinkLog(log.id));
+                      }
                     }
                   }
                 },

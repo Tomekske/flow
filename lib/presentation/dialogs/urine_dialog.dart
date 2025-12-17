@@ -1,25 +1,19 @@
+import 'package:flow/data/models/urine_log.dart';
 import 'package:flutter/material.dart';
-import '../../data/models/log.dart';
 
-class ToiletDialog extends StatefulWidget {
-  final ToiletLog? existingLog;
-  const ToiletDialog({super.key, this.existingLog});
+import '../../data/enums/urine_color.dart';
+
+class UrineDialog extends StatefulWidget {
+  final UrineLog? existingLog;
+  const UrineDialog({super.key, this.existingLog});
 
   @override
-  State<ToiletDialog> createState() => _ToiletDialogState();
+  State<UrineDialog> createState() => _UrineDialogState();
 }
 
-class _ToiletDialogState extends State<ToiletDialog> {
-  int? _selectedColor;
+class _UrineDialogState extends State<UrineDialog> {
+  UrineColor _selectedColor = UrineColor.values[2];
   String _selectedAmount = 'Medium';
-
-  final List<Map<String, dynamic>> _colors = [
-    {'color': 0xFFF7F7F7, 'label': 'Clear'},
-    {'color': 0xFFFFF9C4, 'label': 'Pale'},
-    {'color': 0xFFFFEB3B, 'label': 'Yellow'},
-    {'color': 0xFFFBC02D, 'label': 'Dark'},
-    {'color': 0xFFFFA000, 'label': 'Amber'},
-  ];
 
   final List<String> _amounts = ['Small', 'Medium', 'Large'];
 
@@ -27,8 +21,8 @@ class _ToiletDialogState extends State<ToiletDialog> {
   void initState() {
     super.initState();
     if (widget.existingLog != null) {
-      _selectedColor = widget.existingLog!.urineColor;
-      _selectedAmount = widget.existingLog!.urineAmount ?? 'Medium';
+      _selectedColor = widget.existingLog!.color;
+      _selectedAmount = widget.existingLog!.amount;
     }
   }
 
@@ -68,18 +62,22 @@ class _ToiletDialogState extends State<ToiletDialog> {
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _colors.map((c) {
-                final int colorVal = c['color'];
-                final bool isSelected = _selectedColor == colorVal;
+              // Iterate over the Enum values directly
+              children: UrineColor.values.map((option) {
+                // Compare Enums directly
+                final bool isSelected = _selectedColor == option;
+
                 return GestureDetector(
-                  onTap: () => setState(() => _selectedColor = colorVal),
+                  // Update state with the Enum object
+                  onTap: () => setState(() => _selectedColor = option),
                   child: Column(
                     children: [
                       Container(
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Color(colorVal),
+                          // Access the color getter from your Enum
+                          color: option.color,
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: isSelected
@@ -107,7 +105,8 @@ class _ToiletDialogState extends State<ToiletDialog> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        c['label'],
+                        // Access the label field from your Enum
+                        option.label,
                         style: TextStyle(
                           fontSize: 10,
                           color: isSelected

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/log.dart';
+import '../../data/models/drink_log.dart';
 import '../../helpers/stats_helper.dart';
 import '../../logic/bloc/log_bloc.dart';
-import '../dialogs/toilet_dialog.dart';
-import '../dialogs/intake_dialog.dart';
+import '../dialogs/urine_dialog.dart';
+import '../dialogs/drink_dialog.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  Future<void> _showToiletDialog(BuildContext context) async {
+  Future<void> _showUrineDialog(BuildContext context) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => ToiletDialog(),
+      builder: (context) => UrineDialog(),
     );
     if (result != null && context.mounted) {
       context.read<LogBloc>().add(
-        AddToiletLog(color: result['color'], amount: result['amount']),
+        AddUrineLogEvent(color: result['color'], amount: result['amount']),
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -31,11 +31,11 @@ class HomePage extends StatelessWidget {
   Future<void> _showIntakeDialog(BuildContext context) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => const IntakeDialog(),
+      builder: (context) => const DrinkDialog(),
     );
     if (result != null && context.mounted) {
       context.read<LogBloc>().add(
-        AddFluidLog(fluidType: result['type'], volume: result['volume']),
+        AddDrinkLogEvent(fluidType: result['type'], volume: result['volume']),
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -50,46 +50,51 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LogBloc, LogState>(
       builder: (context, state) {
-        final logs = state.logs;
+        final urineLogs = state.urineLogs;
+        final drinkLogs = state.drinkLogs;
         final now = state.now;
         final todayStr = DateFormat('yyyy-MM-dd').format(now);
 
-        final todayLogs = logs
+        final todayUrineLogs = urineLogs
             .where(
-              (l) => DateFormat('yyyy-MM-dd').format(l.timestamp) == todayStr,
+              (l) => DateFormat('yyyy-MM-dd').format(l.createdAt) == todayStr,
+            )
+            .toList();
+
+        final todayDrinkLogs = drinkLogs
+            .where(
+              (l) => DateFormat('yyyy-MM-dd').format(l.createdAt) == todayStr,
             )
             .toList();
 
         // --- Toilet Metrics ---
-        final toiletLogs = logs.whereType<ToiletLog>().toList();
-        final todayToiletCount = todayLogs.whereType<ToiletLog>().length;
-        final lastToilet = toiletLogs.isNotEmpty ? toiletLogs.first : null;
+        final todayToiletCount = todayUrineLogs.length;
+        final lastToilet = urineLogs.isNotEmpty ? urineLogs.first : null;
         final lastToiletTime = lastToilet != null
-            ? DateFormat('HH:mm').format(lastToilet.timestamp)
+            ? DateFormat('HH:mm').format(lastToilet.createdAt)
             : '--:--';
 
-        final dailyStats = StatsHelper.calculateStats(todayLogs, now: now);
-        final globalStats = StatsHelper.calculateStats(logs, now: null);
+        final dailyStats = StatsHelper.calculateStats(todayUrineLogs, now: now);
+        final globalStats = StatsHelper.calculateStats(urineLogs, now: null);
 
-        final hasTodayData = todayLogs.isNotEmpty;
+        final hasTodayData = todayUrineLogs.isNotEmpty;
         final displayRate = hasTodayData
             ? dailyStats['rate']!
             : globalStats['rate']!;
 
         // --- Intake Metrics ---
-        final intakeLogs = logs.whereType<DrinkLog>().toList();
-        final todayIntakeVol = todayLogs.whereType<DrinkLog>().fold(
+        final todayDrinkVol = todayDrinkLogs.whereType<DrinkLog>().fold(
           0,
           (sum, l) => sum + (l.volume ?? 0),
         );
 
-        final lastIntake = intakeLogs.isNotEmpty ? intakeLogs.first : null;
-        final lastIntakeTime = lastIntake != null
-            ? DateFormat('HH:mm').format(lastIntake.timestamp)
+        final lastDrink = drinkLogs.isNotEmpty ? drinkLogs.first : null;
+        final lastDrinkTime = lastDrink != null
+            ? DateFormat('HH:mm').format(lastDrink.createdAt)
             : '--:--';
 
         final goalLiters = state.dailyGoal;
-        final currentLiters = todayIntakeVol / 1000.0;
+        final currentLiters = todayDrinkVol / 1000.0;
         // Clamp progress to prevent bar overflow if goal is exceeded
         final progress = (goalLiters > 0)
             ? (currentLiters / goalLiters).clamp(0.0, 1.0)
@@ -102,7 +107,7 @@ class HomePage extends StatelessWidget {
             children: [
               // Toilet Card (Amber)
               GestureDetector(
-                onTap: () => _showToiletDialog(context),
+                onTap: () => _showUrineDialog(context),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
@@ -116,7 +121,7 @@ class HomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFF59E0B).withOpacity(0.3),
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -138,7 +143,7 @@ class HomePage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -253,7 +258,7 @@ class HomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF2563EB).withOpacity(0.3),
+                        color: const Color(0xFF2563EB).withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -275,7 +280,7 @@ class HomePage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -344,7 +349,7 @@ class HomePage extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                lastIntakeTime,
+                                lastDrinkTime,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
