@@ -112,7 +112,7 @@ class SupabaseRepository {
     try {
       await _client.from(_drinkLogsTable).update(log.toJson()).eq('id', log.id);
     } catch (e) {
-      debugPrint('Error updating urine log: $e');
+      debugPrint('Error updating drink log: $e');
       rethrow;
     }
   }

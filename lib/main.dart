@@ -15,7 +15,7 @@ Future<void> main() async {
     // Initialize dependencies
     final remoteRepo = SupabaseRepository();
     final service = StorageService(remoteRepo);
-    // await service.initialize();
+    await service.initialize();
 
     // Pass the initialized service to the App
     runApp(FlowTrackApp(storageService: service));

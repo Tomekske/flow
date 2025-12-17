@@ -78,7 +78,7 @@ class StatsHelper {
     final intervalMap = Map.fromIterable(
       List.generate(24, (index) => index + 1), // Generates [1, 2, ..., 24]
       key: (item) => item, // Use the number as the Key
-      value: (_) => [], // Set the Value to 0
+      value: (_) => <DateTime>[], // Initialize with empty list for timestamps
     );
 
     for (var log in sortedLogs) {

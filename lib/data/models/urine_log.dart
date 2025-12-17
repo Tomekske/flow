@@ -22,7 +22,10 @@ class UrineLog {
 
   factory UrineLog.fromJson(Map<String, dynamic> json) {
     try {
-      if (json['id'] == null || json['created_at'] == null) {
+      if (json['id'] == null ||
+          json['created_at'] == null ||
+          json['color'] == null ||
+          json['amount'] == null) {
         throw ArgumentError('Missing required fields: id or created_at');
       }
 
