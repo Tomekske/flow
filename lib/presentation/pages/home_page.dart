@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+
 import '../../helpers/stats_helper.dart';
 import '../../logic/bloc/log_bloc.dart';
-import '../dialogs/urine_dialog.dart';
 import '../dialogs/drink_dialog.dart';
+import '../dialogs/urine_dialog.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -74,37 +75,19 @@ class HomePage extends StatelessWidget {
             )
             .toList();
 
-        // --- Toilet Metrics ---
-        final todayToiletCount = todayUrineLogs.length;
-        final lastToilet = urineLogs.isNotEmpty ? urineLogs.first : null;
-        final lastToiletTime = lastToilet != null
-            ? DateFormat('HH:mm').format(lastToilet.createdAt)
-            : '--:--';
-
-        final dailyStats = StatsHelper.calculateStats(todayUrineLogs, now: now);
-        final globalStats = StatsHelper.calculateStats(urineLogs, now: null);
-
-        final hasTodayData = todayUrineLogs.isNotEmpty;
-        final displayRate = hasTodayData
-            ? dailyStats['rate']!
-            : globalStats['rate']!;
-
-        // --- Intake Metrics ---
-        final todayDrinkVol = todayDrinkLogs.fold(
-          0,
-          (sum, l) => sum + (l.volume ?? 0),
+        final dailyUrinationStats = StatsHelper.getUrinationStats(
+          todayUrineLogs,
+          now: now,
         );
 
-        final lastDrink = drinkLogs.isNotEmpty ? drinkLogs.first : null;
-        final lastDrinkTime = lastDrink != null
-            ? DateFormat('HH:mm').format(lastDrink.createdAt)
-            : '--:--';
+        final dailyDrinkStats = StatsHelper.getDrinkingStats(
+          todayDrinkLogs,
+          now: now,
+        );
 
         final goalLiters = state.dailyGoal;
-        final currentLiters = todayDrinkVol / 1000.0;
-        // Clamp progress to prevent bar overflow if goal is exceeded
         final progress = (goalLiters > 0)
-            ? (currentLiters / goalLiters).clamp(0.0, 1.0)
+            ? (dailyDrinkStats.total / goalLiters).clamp(0.0, 1.0)
             : 0.0;
 
         return Padding(
@@ -112,7 +95,6 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Toilet Card (Amber)
               GestureDetector(
                 onTap: () => _showUrineDialog(context),
                 child: Container(
@@ -163,7 +145,7 @@ class HomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "$todayToiletCount",
+                        dailyUrinationStats.total.toString(),
                         style: const TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
@@ -198,7 +180,11 @@ class HomePage extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    lastToiletTime,
+                                    dailyUrinationStats.lastVisit != null
+                                        ? DateFormat('HH:mm').format(
+                                            dailyUrinationStats.lastVisit!,
+                                          )
+                                        : "--:--",
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -209,11 +195,12 @@ class HomePage extends StatelessWidget {
                               ),
                             ],
                           ),
+                          // Frequency
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                "VISIT RATE",
+                                "FREQUENCY",
                                 style: const TextStyle(
                                   color: Color(0xFFFFFBEB),
                                   fontSize: 10,
@@ -224,19 +211,11 @@ class HomePage extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    displayRate,
+                                    dailyUrinationStats.frequency,
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Text(
-                                    "/ hr",
-                                    style: TextStyle(
-                                      color: Color(0xFFFFFBEB),
-                                      fontSize: 12,
                                     ),
                                   ),
                                 ],
@@ -274,11 +253,12 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Header
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            "Fluid Intake",
+                            "Drink Consumption",
                             style: TextStyle(
                               color: Color(0xFFDBEAFE),
                               fontWeight: FontWeight.w500,
@@ -304,7 +284,7 @@ class HomePage extends StatelessWidget {
                         textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                            currentLiters.toStringAsFixed(1),
+                            dailyDrinkStats.total.toStringAsFixed(1),
                             style: const TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.bold,
@@ -323,6 +303,7 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
+                      // Progress Bar
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
@@ -335,28 +316,59 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "LAST CONSUMPTION",
-                            style: TextStyle(
-                              color: Color(0xFFFFFBEB),
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(
-                                Icons.access_time,
-                                color: Colors.white,
-                                size: 16,
+                              const Text(
+                                "LAST CONSUMPTION",
+                                style: TextStyle(
+                                  color: Color(0xFFDBEAFE),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.access_time,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    dailyDrinkStats.lastConsumption != null
+                                        ? DateFormat('HH:mm').format(
+                                            dailyDrinkStats.lastConsumption!,
+                                          )
+                                        : "--:--",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Text(
+                                "FREQUENCY",
+                                style: TextStyle(
+                                  color: Color(0xFFDBEAFE),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
                               Text(
-                                lastDrinkTime,
+                                dailyDrinkStats.frequency,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,

@@ -1,14 +1,13 @@
 import '../enums/urine_color.dart';
+import 'log_entry.dart';
 
-class UrineLog {
-  final int id;
+class UrineLogEntry extends LogEntry {
   final UrineColor color;
   final String amount;
-  final DateTime createdAt;
 
-  const UrineLog({
-    required this.id,
-    required this.createdAt,
+  const UrineLogEntry({
+    required super.id,
+    required super.createdAt,
     required this.color,
     required this.amount,
   });
@@ -20,7 +19,7 @@ class UrineLog {
     'created_at': createdAt.toIso8601String(),
   };
 
-  factory UrineLog.fromJson(Map<String, dynamic> json) {
+  factory UrineLogEntry.fromJson(Map<String, dynamic> json) {
     try {
       if (json['id'] == null ||
           json['created_at'] == null ||
@@ -29,7 +28,7 @@ class UrineLog {
         throw ArgumentError('Missing required fields: id or created_at');
       }
 
-      return UrineLog(
+      return UrineLogEntry(
         id: json['id'],
         color: UrineColor.fromId(json['color']),
         amount: json['amount'],
@@ -39,13 +38,13 @@ class UrineLog {
       throw FormatException('Failed to parse UrineLog from JSON: $e');
     }
   }
-  UrineLog copyWith({
+  UrineLogEntry copyWith({
     int? id,
     UrineColor? color,
     String? amount,
     DateTime? createdAt,
   }) {
-    return UrineLog(
+    return UrineLogEntry(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       color: color ?? this.color,

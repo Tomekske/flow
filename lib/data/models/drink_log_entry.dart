@@ -1,15 +1,15 @@
-class DrinkLog {
-  final int id;
-  final String fluidType; // Water, Soda, Tea, Soup
-  final int volume; // ml
-  final DateTime createdAt;
+import 'package:flow/data/models/log_entry.dart';
 
-  const DrinkLog({
-    required this.id,
+class DrinkLogEntry extends LogEntry {
+  final String fluidType; // Water, Soda, Tea, Soup
+  final int volume;
+
+  const DrinkLogEntry({
+    required super.id,
+    required super.createdAt,
     required this.fluidType,
     required this.volume,
-    required this.createdAt,
-  });
+  }) ;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -18,7 +18,7 @@ class DrinkLog {
     'created_at': createdAt.toIso8601String(),
   };
 
-  factory DrinkLog.fromJson(Map<String, dynamic> json) {
+  factory DrinkLogEntry.fromJson(Map<String, dynamic> json) {
     try {
       if (json['id'] == null ||
           json['created_at'] == null ||
@@ -27,7 +27,7 @@ class DrinkLog {
         throw ArgumentError('Missing required fields in DrinkLog JSON');
       }
 
-      return DrinkLog(
+      return DrinkLogEntry(
         id: json['id'],
         createdAt: DateTime.parse(json['created_at']),
         fluidType: json['fluid_type'],
@@ -38,13 +38,13 @@ class DrinkLog {
     }
   }
 
-  DrinkLog copyWith({
+  DrinkLogEntry copyWith({
     int? id,
     DateTime? createdAt,
     String? fluidType,
     int? volume,
   }) {
-    return DrinkLog(
+    return DrinkLogEntry(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       fluidType: fluidType ?? this.fluidType,

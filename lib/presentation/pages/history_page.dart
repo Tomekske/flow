@@ -1,21 +1,25 @@
-import 'package:flow/data/models/urine_log.dart';
+import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/drink_log.dart';
+
+import '../../data/models/drink_log_entry.dart';
 import '../../logic/bloc/log_bloc.dart';
 import '../dialogs/confirm_dialog.dart';
-import '../dialogs/urine_dialog.dart';
 import '../dialogs/drink_dialog.dart';
+import '../dialogs/urine_dialog.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
+  /// Handles opening the edit dialog for either log type.
+  /// Using dynamic here allows flexibility, but type checks ensure safety.
   Future<void> _showEditDialog(BuildContext context, dynamic log) async {
     Widget dialog;
-    if (log is UrineLog) {
+
+    if (log is UrineLogEntry) {
       dialog = UrineDialog(existingLog: log);
-    } else if (log is DrinkLog) {
+    } else if (log is DrinkLogEntry) {
       dialog = DrinkDialog(existingLog: log);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -30,15 +34,15 @@ class HistoryScreen extends StatelessWidget {
     );
 
     if (result != null && context.mounted) {
-      if (log is UrineLog) {
-        UrineLog updatedUrineLog = log.copyWith(
+      if (log is UrineLogEntry) {
+        final updatedUrineLog = log.copyWith(
           color: result['color'],
           amount: result['amount'],
           createdAt: result['created_at'],
         );
         context.read<LogBloc>().add(UpdateUrineLogEvent(updatedUrineLog));
-      } else if (log is DrinkLog) {
-        DrinkLog updatedDrinkLog = log.copyWith(
+      } else if (log is DrinkLogEntry) {
+        final updatedDrinkLog = log.copyWith(
           fluidType: result['type'],
           volume: result['volume'],
           createdAt: result['created_at'],
@@ -61,7 +65,7 @@ class HistoryScreen extends StatelessWidget {
       builder: (context, state) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
-        // Filter lists for each tab
+        // Ensure these lists in your State are typed correctly or cast appropriately
         final urineLogs = state.urineLogs;
         final drinkLogs = state.drinkLogs;
 
@@ -162,7 +166,7 @@ class HistoryScreen extends StatelessWidget {
       itemCount: logs.length,
       itemBuilder: (ctx, index) {
         final log = logs[index];
-        final isToilet = log is UrineLog;
+        final isToilet = log is UrineLogEntry;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -213,10 +217,10 @@ class HistoryScreen extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          log is UrineLog
+                          isToilet
                               ? "Toilet Visit"
-                              : log is DrinkLog
-                              ? log.fluidType ?? "Unknown"
+                              : (log is DrinkLogEntry)
+                              ? (log.fluidType)
                               : "Unknown",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -244,8 +248,8 @@ class HistoryScreen extends StatelessWidget {
                           ),
                           child: Text(
                             isToilet
-                                ? (log.amount ?? '?')
-                                : '+${(log as DrinkLog).volume}ml',
+                                ? ((log).amount)
+                                : '+${(log as DrinkLogEntry).volume}ml',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -293,7 +297,7 @@ class HistoryScreen extends StatelessWidget {
                   );
                   if (confirm == true) {
                     if (context.mounted) {
-                      if (log is UrineLog) {
+                      if (log is UrineLogEntry) {
                         context.read<LogBloc>().add(DeleteUrineLog(log.id));
                       } else {
                         context.read<LogBloc>().add(DeleteDrinkLog(log.id));

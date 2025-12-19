@@ -1,107 +1,88 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flow/data/models/urine_log.dart';
+import 'package:flow/data/models/drink_log_entry.dart';
+import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class ChartWidget extends StatelessWidget {
-  final List<UrineLog> urineLogs;
-  final String period; // hourly, weekly, monthly
+  final List<UrineLogEntry> urineLogs;
+  final List<DrinkLogEntry> drinkLogs;
+  final String type; // 'urine' or 'drink'
 
-  const ChartWidget({super.key, required this.urineLogs, required this.period});
+  const ChartWidget({
+    super.key,
+    required this.urineLogs,
+    required this.drinkLogs,
+    required this.type,
+  });
 
   @override
   Widget build(BuildContext context) {
-    List<BarChartGroupData> barGroups = [];
+    // Generate data for 24 hours
+    final hours = List.generate(24, (i) => 0.0);
     double maxY = 0;
 
-    if (period == 'hourly') {
-      final hours = List.generate(24, (i) => 0);
+    if (type == 'urine') {
       for (var log in urineLogs) {
-        hours[log.createdAt.hour]++;
-      }
-      barGroups = List.generate(24, (i) {
-        if (hours[i] > maxY) maxY = hours[i].toDouble();
-        return BarChartGroupData(
-          x: i,
-          barRods: [
-            BarChartRodData(
-              toY: hours[i].toDouble(),
-              color: const Color(0xFF8B5CF6),
-              width: 6,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ],
-        );
-      });
-    } else if (period == 'weekly') {
-      final now = DateTime.now();
-      for (int i = 6; i >= 0; i--) {
-        final d = now.subtract(Duration(days: i));
-        final dayStr = DateFormat('yyyy-MM-dd').format(d);
-        final count = urineLogs
-            .where(
-              (l) => DateFormat('yyyy-MM-dd').format(l.createdAt) == dayStr,
-            )
-            .length;
-        if (count > maxY) maxY = count.toDouble();
-        barGroups.add(
-          BarChartGroupData(
-            x: 6 - i,
-            barRods: [
-              BarChartRodData(
-                toY: count.toDouble(),
-                color: const Color(0xFF3B82F6),
-                width: 16,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ],
-          ),
-        );
+        hours[log.createdAt.hour] += 1.0;
       }
     } else {
-      // Monthly
-      final now = DateTime.now();
-      for (int i = 29; i >= 0; i--) {
-        final d = now.subtract(Duration(days: i));
-        final dayStr = DateFormat('yyyy-MM-dd').format(d);
-        final count = urineLogs
-            .where(
-              (l) => DateFormat('yyyy-MM-dd').format(l.createdAt) == dayStr,
-            )
-            .length;
-        if (count > maxY) maxY = count.toDouble();
-        barGroups.add(
-          BarChartGroupData(
-            x: 29 - i,
-            barRods: [
-              BarChartRodData(
-                toY: count.toDouble(),
-                color: const Color(0xFF0EA5E9),
-                width: 6,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ],
-          ),
-        );
+      for (var log in drinkLogs) {
+        hours[log.createdAt.hour] += log.volume.toDouble();
       }
     }
+
+    // Determine max Y for scaling
+    for (var val in hours) {
+      if (val > maxY) maxY = val;
+    }
+    if (maxY == 0) maxY = 5;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final barColor = type == 'urine' ? Colors.amber : Colors.blue;
+    final bgColor = barColor.withValues(alpha: 0.05);
+
+    // Create Bar Groups
+    final barGroups = List.generate(24, (i) {
+      return BarChartGroupData(
+        x: i,
+        barRods: [
+          BarChartRodData(
+            toY: hours[i],
+            color: barColor,
+            width: 8,
+            borderRadius: BorderRadius.circular(4),
+            backDrawRodData: BackgroundBarChartRodData(
+              show: true,
+              toY: maxY * 1.1,
+              color: bgColor,
+            ),
+          ),
+        ],
+      );
+    });
 
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
-        maxY: maxY == 0 ? 1 : maxY + 1,
+        maxY: maxY * 1.1,
         barTouchData: BarTouchData(
           enabled: true,
           touchTooltipData: BarTouchTooltipData(
             getTooltipColor: (_) => Colors.blueGrey,
-            getTooltipItem: (group, groupIndex, rod, rodIndex) =>
-                BarTooltipItem(
-                  rod.toY.round().toString(),
-                  const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+            tooltipPadding: const EdgeInsets.all(8),
+            tooltipMargin: 8,
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              return BarTooltipItem(
+                type == 'urine'
+                    ? '${rod.toY.toInt()} visits'
+                    : '${rod.toY.toInt()} ml',
+                const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
+              );
+            },
           ),
         ),
         titlesData: FlTitlesData(
@@ -109,35 +90,31 @@ class ChartWidget extends StatelessWidget {
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              getTitlesWidget: (double value, TitleMeta meta) {
-                if (period == 'hourly') {
-                  return value % 4 == 0
-                      ? Text(
-                          '${value.toInt()}h',
-                          style: const TextStyle(
-                            color: Color(0xFF94A3B8),
-                            fontSize: 10,
-                          ),
-                        )
-                      : const SizedBox();
-                } else if (period == 'weekly') {
-                  final date = DateTime.now().subtract(
-                    Duration(days: 6 - value.toInt()),
-                  );
+              reservedSize: 30,
+              // Force checking every single index
+              interval: 1,
+              getTitlesWidget: (value, meta) {
+                final hour = value.toInt();
+
+                // Show label every 2 hours (0, 2, 4...) to prevent overlap
+                // If you strictly want EVERY hour, change this to: if (true)
+                if (hour % 2 == 0) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
-                      DateFormat('E').format(date),
-                      style: const TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 10,
+                      '$hour', // Removed 'h' to save space
+                      style: TextStyle(
+                        color: isDark
+                            ? Colors.grey[400]
+                            : const Color(0xFF94A3B8),
+                        fontSize: 10, // Small font to fit
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   );
                 }
                 return const SizedBox();
               },
-              reservedSize: 30,
             ),
           ),
           leftTitles: const AxisTitles(

@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flow/data/repositories/supabase_repository.dart';
+import 'package:flutter/foundation.dart';
 
-import '../models/drink_log.dart';
-import '../models/urine_log.dart';
+import '../models/drink_log_entry.dart';
+import '../models/urine_log_entry.dart';
 
 class StorageService {
   final SupabaseRepository _remoteRepo;
@@ -20,7 +20,7 @@ class StorageService {
   }
 
   /// Retrieves the list of UrineLogs from Supabase.
-  Future<List<UrineLog>> loadUrineLogs() async {
+  Future<List<UrineLogEntry>> loadUrineLogs() async {
     try {
       return await _remoteRepo.getUrineLogs();
     } catch (e) {
@@ -31,7 +31,7 @@ class StorageService {
   }
 
   /// Adds a single UrineLog to the database.
-  Future<void> addUrineLog(UrineLog log) async {
+  Future<void> addUrineLog(UrineLogEntry log) async {
     try {
       await _remoteRepo.addUrineLog(log);
     } catch (e) {
@@ -50,7 +50,7 @@ class StorageService {
     }
   }
 
-  Future<void> updateUrineLog(UrineLog log) async {
+  Future<void> updateUrineLog(UrineLogEntry log) async {
     try {
       await _remoteRepo.updateUrineLog(log);
     } catch (e) {
@@ -60,7 +60,7 @@ class StorageService {
   }
 
   /// Retrieves the list of DrinkLogs from Supabase.
-  Future<List<DrinkLog>> loadDrinkLogs() async {
+  Future<List<DrinkLogEntry>> loadDrinkLogs() async {
     try {
       return await _remoteRepo.getDrinkLogs();
     } catch (e) {
@@ -70,7 +70,7 @@ class StorageService {
   }
 
   /// Adds a single DrinkLog to the database.
-  Future<void> addDrinkLog(DrinkLog log) async {
+  Future<void> addDrinkLog(DrinkLogEntry log) async {
     try {
       await _remoteRepo.addDrinkLog(log);
     } catch (e) {
@@ -90,7 +90,7 @@ class StorageService {
   }
 
   /// Updates an existing DrinkLog in the database.
-  Future<void> updateDrinkLog(DrinkLog log) async {
+  Future<void> updateDrinkLog(DrinkLogEntry log) async {
     try {
       await _remoteRepo.updateDrinkLog(log);
     } catch (e) {
