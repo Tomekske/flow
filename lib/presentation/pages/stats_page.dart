@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/enums/chart_type.dart';
 import '../../helpers/stats_helper.dart';
 import '../../logic/bloc/log_bloc.dart';
 import '../widgets/chart_widget.dart';
@@ -13,7 +14,7 @@ class StatsScreen extends StatefulWidget {
 }
 
 class _StatsScreenState extends State<StatsScreen> {
-  String _statType = 'urine';
+  ChartType _statType = ChartType.urine;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class _StatsScreenState extends State<StatsScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         // Filter logs for today
-        final now = DateTime.now();
+        final now = state.now;
         final today = DateTime(now.year, now.month, now.day);
 
         final todayUrineLogs = state.urineLogs.where((log) {
@@ -55,25 +56,16 @@ class _StatsScreenState extends State<StatsScreen> {
           now: now,
         );
 
-        final urineTotal = todayUrineLogs.length;
-        final currentHour = now.hour;
-        final urineRate = (urineTotal > 0)
-            ? (urineTotal / (currentHour + 1)).toStringAsFixed(1)
-            : "0.0";
-
-        // Calculate Avg Color (Mode) - NOW TRACKING ACTUAL COLOR OBJECT
+        // Calculate Avg Color (Mode)
         String urineAvgLabel = "-";
         Color? urineAvgColorObj;
 
         if (todayUrineLogs.isNotEmpty) {
           final counts = <String, int>{};
-          // Map label to actual Color object so we can retrieve it later
           final colorMap = <String, Color>{};
 
           for (var log in todayUrineLogs) {
             counts[log.color.label] = (counts[log.color.label] ?? 0) + 1;
-            // Assuming log.color has a .color property returning a Flutter Color
-            // If log.color IS the Flutter color, just use log.color
             colorMap[log.color.label] = log.color.color;
           }
 
@@ -108,10 +100,6 @@ class _StatsScreenState extends State<StatsScreen> {
           0,
           (sum, item) => sum + item.volume,
         );
-        final drinkTotalL = (drinkTotalMl / 1000).toStringAsFixed(1);
-        final drinkRate = (todayDrinkLogs.isNotEmpty)
-            ? (todayDrinkLogs.length / (currentHour + 1)).toStringAsFixed(1)
-            : "0.0";
         final drinkAvgVol = (todayDrinkLogs.isNotEmpty)
             ? (drinkTotalMl / todayDrinkLogs.length).round()
             : 0;
@@ -155,15 +143,18 @@ class _StatsScreenState extends State<StatsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
-                  children: ['urine', 'drink'].map((type) {
+                  // UPDATED: Iterate over ChartType.values instead of string list
+                  children: ChartType.values.map((type) {
                     final isSelected = _statType == type;
-                    final label = type == 'urine' ? 'Toilet' : 'Drinks';
-                    final activeColor = type == 'urine'
+                    // UPDATED: Check enum values
+                    final label = type == ChartType.urine ? 'Toilet' : 'Drinks';
+                    final activeColor = type == ChartType.urine
                         ? Colors.amber
                         : Colors.blue;
 
                     return Expanded(
                       child: GestureDetector(
+                        // UPDATED: Set state with Enum
                         onTap: () => setState(() => _statType = type),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -189,7 +180,8 @@ class _StatsScreenState extends State<StatsScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                type == 'urine'
+                                // UPDATED: Check enum values
+                                type == ChartType.urine
                                     ? Icons.water_drop_outlined
                                     : Icons.local_drink_outlined,
                                 size: 16,
@@ -223,7 +215,7 @@ class _StatsScreenState extends State<StatsScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Chart Area (Day View Only)
+              // Chart Area
               Container(
                 height: 250,
                 padding: const EdgeInsets.only(
@@ -242,15 +234,16 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ),
                 child: ChartWidget(
-                  urineLogs: _statType == 'urine' ? todayUrineLogs : [],
-                  drinkLogs: _statType == 'drink' ? todayDrinkLogs : [],
+                  urineLogs: _statType == ChartType.urine ? todayUrineLogs : [],
+                  drinkLogs: _statType == ChartType.drink ? todayDrinkLogs : [],
                   type: _statType,
                 ),
               ),
               const SizedBox(height: 24),
 
               // Summary Grid
-              if (_statType == 'urine') ...[
+              // UPDATED: Check enum value instead of string
+              if (_statType == ChartType.urine) ...[
                 _buildSummaryGrid(
                   context,
                   isDark,
@@ -385,8 +378,6 @@ class _StatsScreenState extends State<StatsScreen> {
             ),
           ),
           const SizedBox(height: 8),
-
-          // IF displayColor is provided, show the Circle, otherwise show Text
           if (displayColor != null)
             Container(
               width: 24,
@@ -410,7 +401,6 @@ class _StatsScreenState extends State<StatsScreen> {
                 color: valueColor,
               ),
             ),
-
           if (unit.isNotEmpty) ...[
             const SizedBox(height: 2),
             Text(

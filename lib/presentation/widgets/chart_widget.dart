@@ -3,10 +3,12 @@ import 'package:flow/data/models/drink_log_entry.dart';
 import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/enums/chart_type.dart';
+
 class ChartWidget extends StatelessWidget {
   final List<UrineLogEntry> urineLogs;
   final List<DrinkLogEntry> drinkLogs;
-  final String type; // 'urine' or 'drink'
+  final ChartType type;
 
   const ChartWidget({
     super.key,
@@ -21,7 +23,7 @@ class ChartWidget extends StatelessWidget {
     final hours = List.generate(24, (i) => 0.0);
     double maxY = 0;
 
-    if (type == 'urine') {
+    if (type == ChartType.urine) {
       for (var log in urineLogs) {
         hours[log.createdAt.hour] += 1.0;
       }
@@ -39,7 +41,7 @@ class ChartWidget extends StatelessWidget {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final barColor = type == 'urine' ? Colors.amber : Colors.blue;
+    final barColor = type == ChartType.urine ? Colors.amber : Colors.blue;
     final bgColor = barColor.withValues(alpha: 0.05);
 
     // Create Bar Groups
@@ -74,7 +76,7 @@ class ChartWidget extends StatelessWidget {
             tooltipMargin: 8,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               return BarTooltipItem(
-                type == 'urine'
+                type == ChartType.urine
                     ? '${rod.toY.toInt()} visits'
                     : '${rod.toY.toInt()} ml',
                 const TextStyle(

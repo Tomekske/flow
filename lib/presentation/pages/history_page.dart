@@ -1,3 +1,4 @@
+import 'package:flow/data/models/log_entry.dart';
 import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +15,7 @@ class HistoryScreen extends StatelessWidget {
 
   /// Handles opening the edit dialog for either log type.
   /// Using dynamic here allows flexibility, but type checks ensure safety.
-  Future<void> _showEditDialog(BuildContext context, dynamic log) async {
+  Future<void> _showEditDialog(BuildContext context, LogEntry log) async {
     Widget dialog;
 
     if (log is UrineLogEntry) {
@@ -138,7 +139,7 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogList(BuildContext context, List<dynamic> logs, bool isDark) {
+  Widget _buildLogList(BuildContext context, List<LogEntry> logs, bool isDark) {
     if (logs.isEmpty) {
       return Center(
         child: Column(
@@ -248,7 +249,7 @@ class HistoryScreen extends StatelessWidget {
                           ),
                           child: Text(
                             isToilet
-                                ? ((log).amount)
+                                ? ((log as UrineLogEntry).amount)
                                 : '+${(log as DrinkLogEntry).volume}ml',
                             style: TextStyle(
                               fontSize: 10,

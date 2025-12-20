@@ -35,7 +35,7 @@ class UrineLogEntry extends LogEntry {
         createdAt: DateTime.parse(json['created_at']),
       );
     } catch (e) {
-      throw FormatException('Failed to parse UrineLog from JSON: $e');
+      throw FormatException('Failed to parse UrineLogEntry from JSON: $e');
     }
   }
   UrineLogEntry copyWith({

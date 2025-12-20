@@ -1,7 +1,7 @@
 class DrinkingStats {
   final double total;
   final String frequency;
-  DateTime? lastConsumption;
+  final DateTime? lastConsumption;
 
   DrinkingStats({
     required this.total,

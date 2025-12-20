@@ -157,7 +157,7 @@ class SupabaseRepository {
   /// The updated_at timestamp is automatically set to the current time.
   Future<void> saveSettings(String theme, double drinkingGoal) async {
     try {
-      await _client.from('settings').upsert({
+      await _client.from(_settingsTable).upsert({
         'id': 1,
         'theme': theme,
         'drinking_goal': drinkingGoal,

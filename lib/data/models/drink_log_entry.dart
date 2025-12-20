@@ -9,7 +9,7 @@ class DrinkLogEntry extends LogEntry {
     required super.createdAt,
     required this.fluidType,
     required this.volume,
-  }) ;
+  });
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -24,7 +24,7 @@ class DrinkLogEntry extends LogEntry {
           json['created_at'] == null ||
           json['fluid_type'] == null ||
           json['volume'] == null) {
-        throw ArgumentError('Missing required fields in DrinkLog JSON');
+        throw ArgumentError('Missing required fields in DrinkLogEntry JSON');
       }
 
       return DrinkLogEntry(
@@ -34,7 +34,7 @@ class DrinkLogEntry extends LogEntry {
         volume: json['volume'],
       );
     } catch (e) {
-      throw FormatException('Failed to parse DrinkLog from JSON: $e');
+      throw FormatException('Failed to parse DrinkLogEntry from JSON: $e');
     }
   }
 
