@@ -14,7 +14,6 @@ class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
   /// Handles opening the edit dialog for either log type.
-  /// Using dynamic here allows flexibility, but type checks ensure safety.
   Future<void> _showEditDialog(BuildContext context, LogEntry log) async {
     Widget dialog;
 
@@ -61,13 +60,43 @@ class HistoryScreen extends StatelessWidget {
     }
   }
 
+  /// Groups logs by Date (ignoring time)
+  Map<DateTime, List<LogEntry>> _groupLogsByDate(List<LogEntry> logs) {
+    // Sort by date descending first
+    logs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    final grouped = <DateTime, List<LogEntry>>{};
+    for (var log in logs) {
+      final date = DateTime(
+        log.createdAt.year,
+        log.createdAt.month,
+        log.createdAt.day,
+      );
+      if (!grouped.containsKey(date)) {
+        grouped[date] = [];
+      }
+      grouped[date]!.add(log);
+    }
+    return grouped;
+  }
+
+  /// Returns a friendly string for the date header (Today, Yesterday, etc.)
+  String _getDateHeader(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    if (date == today) return "Today";
+    if (date == yesterday) return "Yesterday";
+    return DateFormat('EEEE, MMM d').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LogBloc, LogState>(
       builder: (context, state) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
-        // Ensure these lists in your State are typed correctly or cast appropriately
         final urineLogs = state.urineLogs;
         final drinkLogs = state.drinkLogs;
 
@@ -163,158 +192,203 @@ class HistoryScreen extends StatelessWidget {
       );
     }
 
+    // 1. Group logs by date
+    final groupedLogs = _groupLogsByDate(logs);
+    final sortedDates = groupedLogs.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      itemCount: logs.length,
+      itemCount: sortedDates.length,
       itemBuilder: (ctx, index) {
-        final log = logs[index];
-        final isToilet = log is UrineLogEntry;
+        final date = sortedDates[index];
+        final dayLogs = groupedLogs[date] ?? [];
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark ? Colors.grey[800] : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDark ? Colors.transparent : const Color(0xFFF1F5F9),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 2. Date Header
+            Padding(
+              padding: const EdgeInsets.only(top: 24.0, bottom: 12.0),
+              child: Text(
+                _getDateHeader(date),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.grey[300] : const Color(0xFF334155),
+                ),
+              ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Icon Box
-              Container(
-                width: 40,
-                height: 40,
-                margin: const EdgeInsets.only(right: 16),
+            // 3. List of items for this date
+            ...dayLogs.map((log) {
+              final isToilet = log is UrineLogEntry;
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isToilet
-                      ? (isDark
-                            ? Colors.amber.withValues(alpha: 0.2)
-                            : Colors.amber.shade50)
-                      : (isDark
-                            ? Colors.blue.withValues(alpha: 0.2)
-                            : Colors.blue.shade50),
-                  shape: BoxShape.circle,
+                  color: isDark ? Colors.grey[800] : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.transparent
+                        : const Color(0xFFF1F5F9),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: Icon(
-                  isToilet ? Icons.water_drop : Icons.local_drink,
-                  color: isToilet
-                      ? (isDark ? Colors.amberAccent : Colors.amber.shade700)
-                      : (isDark ? Colors.blueAccent : Colors.blue.shade700),
-                  size: 20,
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          isToilet
-                              ? "Toilet Visit"
-                              : (log is DrinkLogEntry)
-                              ? (log.fluidType)
-                              : "Unknown",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF334155),
+                    // Icon Box
+                    Container(
+                      width: 40,
+                      height: 40,
+                      margin: const EdgeInsets.only(right: 16),
+                      decoration: BoxDecoration(
+                        color: isToilet
+                            ? (isDark
+                                  ? Colors.amber.withValues(alpha: 0.2)
+                                  : Colors.amber.shade50)
+                            : (isDark
+                                  ? Colors.blue.withValues(alpha: 0.2)
+                                  : Colors.blue.shade50),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isToilet ? Icons.water_drop : Icons.local_drink,
+                        color: isToilet
+                            ? (isDark
+                                  ? Colors.amberAccent
+                                  : Colors.amber.shade700)
+                            : (isDark
+                                  ? Colors.blueAccent
+                                  : Colors.blue.shade700),
+                        size: 20,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                isToilet
+                                    ? "Toilet Visit"
+                                    : (log is DrinkLogEntry)
+                                    ? (log.fluidType)
+                                    : "Unknown",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF334155),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isToilet
+                                      ? (isDark
+                                            ? Colors.amber.withValues(
+                                                alpha: 0.2,
+                                              )
+                                            : Colors.amber.shade50)
+                                      : (isDark
+                                            ? Colors.blue.withValues(alpha: 0.2)
+                                            : Colors.blue.shade50),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  isToilet
+                                      ? ((log as UrineLogEntry).amount)
+                                      : '+${(log as DrinkLogEntry).volume}ml',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: isToilet
+                                        ? (isDark
+                                              ? Colors.amberAccent
+                                              : Colors.amber.shade700)
+                                        : (isDark
+                                              ? Colors.blueAccent
+                                              : Colors.blue.shade700),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isToilet
-                                ? (isDark
-                                      ? Colors.amber.withValues(alpha: 0.2)
-                                      : Colors.amber.shade50)
-                                : (isDark
-                                      ? Colors.blue.withValues(alpha: 0.2)
-                                      : Colors.blue.shade50),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            isToilet
-                                ? ((log as UrineLogEntry).amount)
-                                : '+${(log as DrinkLogEntry).volume}ml',
+                          const SizedBox(height: 4),
+                          // Only showing time here, as date is in the header
+                          Text(
+                            DateFormat('HH:mm').format(log.createdAt),
                             style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: isToilet
-                                  ? (isDark
-                                        ? Colors.amberAccent
-                                        : Colors.amber.shade700)
-                                  : (isDark
-                                        ? Colors.blueAccent
-                                        : Colors.blue.shade700),
+                              fontSize: 12,
+                              color: isDark
+                                  ? Colors.grey[400]
+                                  : const Color(0xFF94A3B8),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "${DateFormat('yyyy-MM-dd').format(log.createdAt)} • ${DateFormat('HH:mm').format(log.createdAt)}",
-                      style: TextStyle(
-                        fontSize: 12,
+                    IconButton(
+                      onPressed: () => _showEditDialog(context, log),
+                      icon: Icon(
+                        Icons.edit,
                         color: isDark
-                            ? Colors.grey[400]
-                            : const Color(0xFF94A3B8),
+                            ? Colors.grey[500]
+                            : const Color(0xFFCBD5E1),
+                        size: 20,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        final confirm = await showConfirmDialog(
+                          context,
+                          title: "Delete?",
+                          content: "Remove this entry?",
+                          confirmText: "Delete",
+                          confirmColor: Colors.red,
+                        );
+                        if (confirm == true) {
+                          if (context.mounted) {
+                            if (log is UrineLogEntry) {
+                              context.read<LogBloc>().add(
+                                DeleteUrineLog(log.id),
+                              );
+                            } else {
+                              context.read<LogBloc>().add(
+                                DeleteDrinkLog(log.id),
+                              );
+                            }
+                          }
+                        }
+                      },
+                      icon: Icon(
+                        Icons.delete_outline,
+                        color: isDark
+                            ? Colors.grey[500]
+                            : const Color(0xFFCBD5E1),
+                        size: 20,
                       ),
                     ),
                   ],
                 ),
-              ),
-              IconButton(
-                onPressed: () => _showEditDialog(context, log),
-                icon: Icon(
-                  Icons.edit,
-                  color: isDark ? Colors.grey[500] : const Color(0xFFCBD5E1),
-                  size: 20,
-                ),
-              ),
-              IconButton(
-                onPressed: () async {
-                  final confirm = await showConfirmDialog(
-                    context,
-                    title: "Delete?",
-                    content: "Remove this entry?",
-                    confirmText: "Delete",
-                    confirmColor: Colors.red,
-                  );
-                  if (confirm == true) {
-                    if (context.mounted) {
-                      if (log is UrineLogEntry) {
-                        context.read<LogBloc>().add(DeleteUrineLog(log.id));
-                      } else {
-                        context.read<LogBloc>().add(DeleteDrinkLog(log.id));
-                      }
-                    }
-                  }
-                },
-                icon: Icon(
-                  Icons.delete_outline,
-                  color: isDark ? Colors.grey[500] : const Color(0xFFCBD5E1),
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
+              );
+            }),
+            const SizedBox(height: 8),
+          ],
         );
       },
     );
