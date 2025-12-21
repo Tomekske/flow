@@ -11,16 +11,18 @@ class LoadData extends LogEvent {}
 class AddUrineLogEvent extends LogEvent {
   final UrineColor? color;
   final String? amount;
+  final int urgency; // Added urgency field
   final DateTime createdAt;
 
   const AddUrineLogEvent({
     this.color,
     this.amount,
+    required this.urgency, // Required in constructor
     required this.createdAt,
   });
 
   @override
-  List<Object?> get props => [color, amount, createdAt];
+  List<Object?> get props => [color, amount, urgency, createdAt];
 }
 
 class AddDrinkLogEvent extends LogEvent {

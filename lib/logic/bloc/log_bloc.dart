@@ -108,6 +108,7 @@ class LogBloc extends Bloc<LogEvent, LogState> {
         createdAt: event.createdAt,
         color: event.color!,
         amount: event.amount!,
+        urgency: event.urgency,
       );
 
       await _storageService.addUrineLog(newLog);

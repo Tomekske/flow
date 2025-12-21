@@ -20,6 +20,7 @@ class HomePage extends StatelessWidget {
         AddUrineLogEvent(
           color: result['color'],
           amount: result['amount'],
+          urgency: result['urgency'],
           createdAt: result['created_at'],
         ),
       );
