@@ -1,10 +1,11 @@
+import '../enums/urgency_level.dart';
 import '../enums/urine_color.dart';
 import 'log_entry.dart';
 
 class UrineLogEntry extends LogEntry {
   final UrineColor color;
   final String amount;
-  final int urgency;
+  final UrgencyLevel urgency;
 
   const UrineLogEntry({
     required super.id,
@@ -18,7 +19,7 @@ class UrineLogEntry extends LogEntry {
     'id': id,
     'color': color.index,
     'amount': amount,
-    'urgency': urgency,
+    'urgency': urgency.value,
     'created_at': createdAt.toIso8601String(),
   };
 
@@ -35,7 +36,12 @@ class UrineLogEntry extends LogEntry {
         id: json['id'],
         color: UrineColor.fromId(json['color']),
         amount: json['amount'],
-        urgency: (json['urgency'] is int) ? json['urgency'] : 2,
+        urgency: (json['urgency'] is int)
+            ? UrgencyLevel.values.firstWhere(
+                (e) => e.value == json['urgency'],
+                orElse: () => UrgencyLevel.normal,
+              )
+            : UrgencyLevel.normal,
         createdAt: DateTime.parse(json['created_at']),
       );
     } catch (e) {
@@ -47,7 +53,7 @@ class UrineLogEntry extends LogEntry {
     int? id,
     UrineColor? color,
     String? amount,
-    int? urgency,
+    UrgencyLevel? urgency,
     DateTime? createdAt,
   }) {
     return UrineLogEntry(

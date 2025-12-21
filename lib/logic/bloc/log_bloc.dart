@@ -1,10 +1,13 @@
 import 'dart:async';
+
+import 'package:equatable/equatable.dart';
+import 'package:flow/data/enums/urgency_level.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
+
 import '../../data/enums/urine_color.dart';
-import '../../data/models/urine_log_entry.dart';
 import '../../data/models/drink_log_entry.dart';
+import '../../data/models/urine_log_entry.dart';
 import '../../data/services/storage_service.dart';
 
 part 'log_event.dart';
@@ -27,7 +30,6 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     on<UpdateSettings>(_onUpdateSettings);
     on<UpdateTime>(_onUpdateTime);
 
-    // Initialize the service (auth) then load data
     _initialize();
 
     _timer = Timer.periodic(const Duration(minutes: 1), (_) {
@@ -74,7 +76,6 @@ class LogBloc extends Bloc<LogEvent, LogState> {
   Future<void> _onLoadData(LoadData event, Emitter<LogState> emit) async {
     emit(state.copyWith(status: LogStatus.loading));
     try {
-      // Fetch both lists
       final urineLogs = await _storageService.loadUrineLogs();
       final drinkLogs = await _storageService.loadDrinkLogs();
       final settings = await _storageService.loadSettings();

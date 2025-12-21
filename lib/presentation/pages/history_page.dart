@@ -40,6 +40,7 @@ class HistoryScreen extends StatelessWidget {
           color: result['color'],
           amount: result['amount'],
           createdAt: result['created_at'],
+          urgency: result['urgency'],
         );
         context.read<LogBloc>().add(UpdateUrineLogEvent(updatedUrineLog));
       } else if (log is DrinkLogEntry) {
