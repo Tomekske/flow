@@ -35,7 +35,6 @@ class UrineLogEntry extends LogEntry {
         id: json['id'],
         color: UrineColor.fromId(json['color']),
         amount: json['amount'],
-        // Check if urgency exists and is an int, otherwise default to 2 (Normal)
         urgency: (json['urgency'] is int) ? json['urgency'] : 2,
         createdAt: DateTime.parse(json['created_at']),
       );
@@ -48,7 +47,7 @@ class UrineLogEntry extends LogEntry {
     int? id,
     UrineColor? color,
     String? amount,
-    int? urgency, //
+    int? urgency,
     DateTime? createdAt,
   }) {
     return UrineLogEntry(
@@ -56,7 +55,7 @@ class UrineLogEntry extends LogEntry {
       createdAt: createdAt ?? this.createdAt,
       color: color ?? this.color,
       amount: amount ?? this.amount,
-      urgency: urgency ?? this.urgency, //
+      urgency: urgency ?? this.urgency,
     );
   }
 }
