@@ -94,6 +94,24 @@ class _StatsScreenState extends State<StatsScreen> {
           });
         }
 
+        // Calculate Avg Urgency (Mode)
+        String urineAvgUrgency = "-";
+        if (todayUrineLogs.isNotEmpty) {
+          final counts = <String, int>{};
+          for (var log in todayUrineLogs) {
+            // FIX: Convert Enum to String using .name
+            final urgencyKey = log.urgency.name;
+            counts[urgencyKey] = (counts[urgencyKey] ?? 0) + 1;
+          }
+          var max = 0;
+          counts.forEach((k, v) {
+            if (v > max) {
+              max = v;
+              urineAvgUrgency = k;
+            }
+          });
+        }
+
         // --- DRINK ---
         final drinkTotalMl = todayDrinkLogs.fold<int>(
           0,
@@ -142,10 +160,8 @@ class _StatsScreenState extends State<StatsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
-                  // UPDATED: Iterate over ChartType.values instead of string list
                   children: ChartType.values.map((type) {
                     final isSelected = _statType == type;
-                    // UPDATED: Check enum values
                     final label = type == ChartType.urine ? 'Toilet' : 'Drinks';
                     final activeColor = type == ChartType.urine
                         ? Colors.amber
@@ -153,7 +169,6 @@ class _StatsScreenState extends State<StatsScreen> {
 
                     return Expanded(
                       child: GestureDetector(
-                        // UPDATED: Set state with Enum
                         onTap: () => setState(() => _statType = type),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -179,7 +194,6 @@ class _StatsScreenState extends State<StatsScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                // UPDATED: Check enum values
                                 type == ChartType.urine
                                     ? Icons.water_drop_outlined
                                     : Icons.local_drink_outlined,
@@ -241,73 +255,81 @@ class _StatsScreenState extends State<StatsScreen> {
               const SizedBox(height: 24),
 
               // Summary Grid
-              // UPDATED: Check enum value instead of string
               if (_statType == ChartType.urine) ...[
                 _buildSummaryGrid(
                   context,
-                  isDark,
-                  item1: _buildSummaryItem(
-                    context,
-                    "Today Total",
-                    dailyUrinationStats.total.toString(),
-                    "visits",
-                    Colors.amber,
-                  ),
-                  item2: _buildSummaryItem(
-                    context,
-                    "Frequency",
-                    dailyUrinationStats.frequency,
-                    "",
-                    isDark ? Colors.white : Colors.black87,
-                  ),
-                  item3: _buildSummaryItem(
-                    context,
-                    "Avg Color",
-                    urineAvgLabel,
-                    "",
-                    isDark ? Colors.white : Colors.black87,
-                    displayColor: urineAvgColorObj,
-                  ),
-                  item4: _buildSummaryItem(
-                    context,
-                    "Avg Volume",
-                    urineAvgVol,
-                    "",
-                    isDark ? Colors.white : Colors.black87,
-                  ),
+                  [
+                    _buildSummaryItem(
+                      context,
+                      "Today Total",
+                      dailyUrinationStats.total.toString(),
+                      "visits",
+                      Colors.amber,
+                    ),
+                    _buildSummaryItem(
+                      context,
+                      "Frequency",
+                      dailyUrinationStats.frequency,
+                      "",
+                      isDark ? Colors.white : Colors.black87,
+                    ),
+                    _buildSummaryItem(
+                      context,
+                      "Avg Color",
+                      urineAvgLabel,
+                      "",
+                      isDark ? Colors.white : Colors.black87,
+                      displayColor: urineAvgColorObj,
+                    ),
+                    _buildSummaryItem(
+                      context,
+                      "Avg Volume",
+                      urineAvgVol,
+                      "",
+                      isDark ? Colors.white : Colors.black87,
+                    ),
+                    _buildSummaryItem(
+                      context,
+                      "Avg Urgency",
+                      urineAvgUrgency,
+                      "",
+                      isDark ? Colors.white : Colors.black87,
+                    ),
+                  ],
                 ),
               ] else ...[
                 _buildSummaryGrid(
                   context,
-                  isDark,
-                  item1: _buildSummaryItem(
-                    context,
-                    "Today Total",
-                    dailyDrinkStats.total.toString(),
-                    "Liters",
-                    Colors.blue,
-                  ),
-                  item2: _buildSummaryItem(
-                    context,
-                    "Frequency",
-                    dailyDrinkStats.frequency,
-                    "",
-                    isDark ? Colors.white : Colors.black87,
-                  ),
-                  item3: _buildSummaryItem(
-                    context,
-                    "Most Consumed",
-                    drinkMostConsumed,
-                    "",
-                    isDark ? Colors.white : Colors.black87,
-                  ),
-                  item4: _buildSummaryItem(
-                    context,
-                    "Avg Drinking Volume",
-                    "$drinkAvgVol",
-                    "ml",
-                    isDark ? Colors.white : Colors.black87,
-                  ),
+                  [
+                    _buildSummaryItem(
+                      context,
+                      "Today Total",
+                      dailyDrinkStats.total.toString(),
+                      "Liters",
+                      Colors.blue,
+                    ),
+                    _buildSummaryItem(
+                      context,
+                      "Frequency",
+                      dailyDrinkStats.frequency,
+                      "",
+                      isDark ? Colors.white : Colors.black87,
+                    ),
+                    _buildSummaryItem(
+                      context,
+                      "Most Consumed",
+                      drinkMostConsumed,
+                      "",
+                      isDark ? Colors.white : Colors.black87,
+                    ),
+                    _buildSummaryItem(
+                      context,
+                      "Avg Drinking Volume",
+                      "$drinkAvgVol",
+                      "ml",
+                      isDark ? Colors.white : Colors.black87,
+                    ),
+                  ],
                 ),
               ],
             ],
@@ -317,32 +339,17 @@ class _StatsScreenState extends State<StatsScreen> {
     );
   }
 
-  Widget _buildSummaryGrid(
-    BuildContext context,
-    bool isDark, {
-    required Widget item1,
-    required Widget item2,
-    required Widget item3,
-    required Widget item4,
-  }) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(child: item1),
-            const SizedBox(width: 12),
-            Expanded(child: item2),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(child: item3),
-            const SizedBox(width: 12),
-            Expanded(child: item4),
-          ],
-        ),
-      ],
+  // Uses GridView with AspectRatio
+  Widget _buildSummaryGrid(BuildContext context, List<Widget> items) {
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      // UPDATED: Increased ratio to 1.6 to make cards shorter (less vertical padding)
+      childAspectRatio: 1.6,
+      children: items,
     );
   }
 
@@ -357,7 +364,8 @@ class _StatsScreenState extends State<StatsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      // UPDATED: Reduced vertical padding to 8
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -366,6 +374,7 @@ class _StatsScreenState extends State<StatsScreen> {
         ),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             title.toUpperCase(),
@@ -375,8 +384,9 @@ class _StatsScreenState extends State<StatsScreen> {
               color: isDark ? Colors.grey[400] : const Color(0xFF94A3B8),
               letterSpacing: 0.5,
             ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           if (displayColor != null)
             Container(
               width: 24,
@@ -401,7 +411,6 @@ class _StatsScreenState extends State<StatsScreen> {
               ),
             ),
           if (unit.isNotEmpty) ...[
-            const SizedBox(height: 2),
             Text(
               unit,
               style: TextStyle(
