@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+
 import '../../data/models/drink_log_entry.dart';
 
 class DrinkDialog extends StatefulWidget {
   final DrinkLogEntry? existingLog;
+
   const DrinkDialog({super.key, this.existingLog});
 
   @override
@@ -25,7 +27,7 @@ class _DrinkDialogState extends State<DrinkDialog> {
     {'id': 'Tea', 'icon': Icons.emoji_food_beverage_rounded, 'label': 'Tea'},
     {'id': 'Alcohol', 'icon': Icons.liquor_rounded, 'label': 'Alcohol'},
   ];
-  final List<int> _volumes = [200, 250, 330, 500];
+  final List<int> _volumes = [100, 200, 250, 330, 500];
 
   @override
   void initState() {
@@ -94,7 +96,6 @@ class _DrinkDialogState extends State<DrinkDialog> {
             ),
             const SizedBox(height: 24),
 
-            // Date Time Picker
             Text(
               "Time",
               style: TextStyle(
@@ -191,8 +192,7 @@ class _DrinkDialogState extends State<DrinkDialog> {
                               )
                             : FaIcon(
                                 t['icon'],
-                                size:
-                                    20, // FaIcons can sometimes be slightly larger/smaller
+                                size: 20,
                                 color: isSelected
                                     ? (isDark ? Colors.blueAccent : Colors.blue)
                                     : (isDark
@@ -228,15 +228,25 @@ class _DrinkDialogState extends State<DrinkDialog> {
               ),
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              children: _volumes.map((vol) {
+
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 2.2,
+              ),
+              itemCount: _volumes.length,
+              itemBuilder: (context, index) {
+                final vol = _volumes[index];
                 final bool isSelected = _selectedVolume == vol;
+
                 return GestureDetector(
                   onTap: () => setState(() => _selectedVolume = vol),
-                  child: Container(
-                    width: 60,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? const Color(0xFF2563EB)
@@ -244,34 +254,43 @@ class _DrinkDialogState extends State<DrinkDialog> {
                                 ? Colors.grey[800]
                                 : const Color(0xFFF1F5F9)),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF2563EB)
+                            : (isDark
+                                  ? Colors.transparent
+                                  : const Color(0xFFE2E8F0)),
+                        width: 1,
+                      ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: Colors.blue.withValues(alpha: 0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                                color: const Color(
+                                  0xFF2563EB,
+                                ).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
                             ]
                           : [],
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      '+$vol',
+                      '$vol',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: isSelected
                             ? Colors.white
                             : (isDark
-                                  ? Colors.grey[400]
-                                  : const Color(0xFF64748B)),
+                                  ? Colors.grey[300]
+                                  : const Color(0xFF334155)),
                       ),
                     ),
                   ),
                 );
-              }).toList(),
+              },
             ),
-
             const SizedBox(height: 32),
 
             Row(
