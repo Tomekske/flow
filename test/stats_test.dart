@@ -1,5 +1,5 @@
 import 'package:flow/data/enums/urine_color.dart';
-import 'package:flow/data/models/urine_log.dart';
+import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flow/helpers/stats_helper.dart';
 import 'package:test/test.dart';
 
@@ -166,13 +166,13 @@ void main() {
     test('Calculates average time between logs correctly', () {
       final logs = [
         [
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
@@ -181,13 +181,13 @@ void main() {
         ],
         [
           // Interval 1
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
@@ -195,13 +195,13 @@ void main() {
           ),
 
           // Interval 2
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(1, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(1, 30),
             id: 2,
             color: UrineColor.clear,
@@ -210,13 +210,13 @@ void main() {
         ],
         [
           // Interval 1
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
@@ -224,19 +224,19 @@ void main() {
           ),
 
           // Interval 2
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(1, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(1, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(2, 15),
             id: 3,
             color: UrineColor.clear,
@@ -244,7 +244,7 @@ void main() {
           ),
 
           // Interval 3
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(2, 15),
             id: 1,
             color: UrineColor.clear,
@@ -253,19 +253,19 @@ void main() {
         ],
         [
           // Interval 1
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(2, 15),
             id: 1,
             color: UrineColor.clear,
@@ -273,19 +273,19 @@ void main() {
           ),
 
           // Interval 2
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(1, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(1, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
           ),
-          UrineLog(
+          UrineLogEntry(
             createdAt: time(2, 15),
             id: 3,
             color: UrineColor.clear,
@@ -294,10 +294,10 @@ void main() {
         ],
       ];
 
-      expect(StatsHelper.calculateAverageInterval(logs[0], time(0, 45)), 2.0);
-      expect(StatsHelper.calculateAverageInterval(logs[1], time(1, 45)), 2.0);
-      expect(StatsHelper.calculateAverageInterval(logs[2], time(2, 45)), 2.0);
-      expect(StatsHelper.calculateAverageInterval(logs[3], time(2, 45)), 2.0);
+      expect(StatsHelper.calculateFrequencyPerHour(logs[0], time(0, 45)), 2.0);
+      expect(StatsHelper.calculateFrequencyPerHour(logs[1], time(1, 45)), 2.0);
+      expect(StatsHelper.calculateFrequencyPerHour(logs[2], time(2, 45)), 2.0);
+      expect(StatsHelper.calculateFrequencyPerHour(logs[3], time(2, 45)), 2.0);
     });
   });
 }

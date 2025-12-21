@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import '../../data/models/drink_log.dart';
+import '../../data/models/drink_log_entry.dart';
 
 class DrinkDialog extends StatefulWidget {
-  final DrinkLog? existingLog;
+  final DrinkLogEntry? existingLog;
   const DrinkDialog({super.key, this.existingLog});
 
   @override

@@ -39,14 +39,14 @@ class AddDrinkLogEvent extends LogEvent {
 }
 
 class UpdateUrineLogEvent extends LogEvent {
-  final UrineLog log;
+  final UrineLogEntry log;
   const UpdateUrineLogEvent(this.log);
   @override
   List<Object> get props => [log];
 }
 
 class UpdateDrinkLogEvent extends LogEvent {
-  final DrinkLog log;
+  final DrinkLogEntry log;
   const UpdateDrinkLogEvent(this.log);
   @override
   List<Object> get props => [log];

@@ -4,8 +4,8 @@ enum LogStatus { initial, loading, success, failure }
 
 class LogState extends Equatable {
   // Separate lists for urine and drink logs, each sorted by date
-  final List<UrineLog> urineLogs;
-  final List<DrinkLog> drinkLogs;
+  final List<UrineLogEntry> urineLogs;
+  final List<DrinkLogEntry> drinkLogs;
   final DateTime now;
   final LogStatus status;
   final String theme; // 'light' or 'dark'
@@ -21,8 +21,8 @@ class LogState extends Equatable {
   });
 
   LogState copyWith({
-    List<UrineLog>? urineLogs,
-    List<DrinkLog>? drinkLogs,
+    List<UrineLogEntry>? urineLogs,
+    List<DrinkLogEntry>? drinkLogs,
     DateTime? now,
     LogStatus? status,
     String? theme,

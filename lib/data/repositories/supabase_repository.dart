@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/drink_log.dart';
-import '../models/urine_log.dart';
+import '../models/drink_log_entry.dart';
+import '../models/urine_log_entry.dart';
 
 class SupabaseRepository {
   final SupabaseClient _client = Supabase.instance.client;
   static const String _urineLogsTable = 'urine_logs';
   static const String _drinkLogsTable = 'drink_logs';
+  static const String _settingsTable = 'settings';
 
   Future<void> initializeUser() async {
     if (_client.auth.currentUser == null) {
@@ -16,14 +17,14 @@ class SupabaseRepository {
   }
 
   /// Fetches the list of UrineLogs, ordered by newest first.
-  Future<List<UrineLog>> getUrineLogs() async {
+  Future<List<UrineLogEntry>> getUrineLogs() async {
     try {
       final List<dynamic> data = await _client
           .from(_urineLogsTable)
           .select()
           .order('created_at', ascending: false);
 
-      return data.map((json) => UrineLog.fromJson(json)).toList();
+      return data.map((json) => UrineLogEntry.fromJson(json)).toList();
     } catch (e) {
       debugPrint('Error loading urine logs: $e');
       rethrow;
@@ -34,7 +35,7 @@ class SupabaseRepository {
   ///
   /// Note: This ignores the `id` inside the [log] object, as Supabase
   /// should generate a unique ID (auto-increment) upon insertion.
-  Future<void> addUrineLog(UrineLog log) async {
+  Future<void> addUrineLog(UrineLogEntry log) async {
     try {
       // We convert the model to JSON
       final data = log.toJson();
@@ -50,7 +51,7 @@ class SupabaseRepository {
     }
   }
 
-  Future<void> updateUrineLog(UrineLog log) async {
+  Future<void> updateUrineLog(UrineLogEntry log) async {
     try {
       await _client.from(_urineLogsTable).update(log.toJson()).eq('id', log.id);
     } catch (e) {
@@ -68,14 +69,14 @@ class SupabaseRepository {
     }
   }
 
-  Future<List<DrinkLog>> getDrinkLogs() async {
+  Future<List<DrinkLogEntry>> getDrinkLogs() async {
     try {
       final List<dynamic> data = await _client
           .from(_drinkLogsTable)
           .select()
           .order('created_at', ascending: false);
 
-      return data.map((json) => DrinkLog.fromJson(json)).toList();
+      return data.map((json) => DrinkLogEntry.fromJson(json)).toList();
     } catch (e) {
       debugPrint('Error loading drink logs: $e');
       rethrow;
@@ -86,7 +87,7 @@ class SupabaseRepository {
   ///
   /// Note: The 'id' is removed from the JSON payload so Supabase can
   /// auto-increment the primary key.
-  Future<void> addDrinkLog(DrinkLog log) async {
+  Future<void> addDrinkLog(DrinkLogEntry log) async {
     try {
       final data = log.toJson();
       data.remove('id'); // Let database handle ID generation
@@ -108,7 +109,7 @@ class SupabaseRepository {
     }
   }
 
-  Future<void> updateDrinkLog(DrinkLog log) async {
+  Future<void> updateDrinkLog(DrinkLogEntry log) async {
     try {
       await _client.from(_drinkLogsTable).update(log.toJson()).eq('id', log.id);
     } catch (e) {
@@ -125,7 +126,7 @@ class SupabaseRepository {
   Future<Map<String, dynamic>> loadSettings() async {
     try {
       final data = await _client
-          .from('settings')
+          .from(_settingsTable)
           .select()
           .eq('id', 1)
           .maybeSingle();
@@ -136,7 +137,7 @@ class SupabaseRepository {
           'theme': 'light',
           'drinking_goal': 2.0,
         };
-        await _client.from('settings').insert(defaults);
+        await _client.from(_settingsTable).insert(defaults);
         return {'theme': 'light', 'drinking_goal': 2.0};
       }
 
@@ -156,7 +157,7 @@ class SupabaseRepository {
   /// The updated_at timestamp is automatically set to the current time.
   Future<void> saveSettings(String theme, double drinkingGoal) async {
     try {
-      await _client.from('settings').upsert({
+      await _client.from(_settingsTable).upsert({
         'id': 1,
         'theme': theme,
         'drinking_goal': drinkingGoal,
