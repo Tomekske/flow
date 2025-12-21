@@ -25,7 +25,7 @@ class UrineLogEntry extends LogEntry {
           json['created_at'] == null ||
           json['color'] == null ||
           json['amount'] == null) {
-        throw ArgumentError('Missing required fields: id or created_at');
+        throw ArgumentError('Missing required fields in UrineLogEntry JSON');
       }
 
       return UrineLogEntry(

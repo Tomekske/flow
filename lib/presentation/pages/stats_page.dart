@@ -45,7 +45,6 @@ class _StatsScreenState extends State<StatsScreen> {
         }).toList();
 
         // Calculate Stats
-        // --- URINE ---
         final dailyDrinkStats = StatsHelper.getDrinkingStats(
           todayDrinkLogs,
           now: now,
