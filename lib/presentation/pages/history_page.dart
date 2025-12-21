@@ -60,7 +60,6 @@ class HistoryScreen extends StatelessWidget {
     }
   }
 
-  /// Groups logs by Date (ignoring time)
   Map<DateTime, List<LogEntry>> _groupLogsByDate(List<LogEntry> logs) {
     // Sort by date descending first
     logs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -88,7 +87,7 @@ class HistoryScreen extends StatelessWidget {
 
     if (date == today) return "Today";
     if (date == yesterday) return "Yesterday";
-    return DateFormat('EEEE, MMM d').format(date);
+    return DateFormat('yyyy-MM-dd').format(date);
   }
 
   @override
@@ -207,7 +206,6 @@ class HistoryScreen extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 2. Date Header
             Padding(
               padding: const EdgeInsets.only(top: 24.0, bottom: 12.0),
               child: Text(
@@ -219,9 +217,16 @@ class HistoryScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // 3. List of items for this date
             ...dayLogs.map((log) {
               final isToilet = log is UrineLogEntry;
+
+              Color baseColor;
+              if (isToilet) {
+                final urineLog = log as UrineLogEntry;
+                baseColor = urineLog.color.color;
+              } else {
+                baseColor = isDark ? Colors.blueAccent : Colors.blue;
+              }
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -244,16 +249,13 @@ class HistoryScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    // Icon Box
                     Container(
                       width: 40,
                       height: 40,
                       margin: const EdgeInsets.only(right: 16),
                       decoration: BoxDecoration(
                         color: isToilet
-                            ? (isDark
-                                  ? Colors.amber.withValues(alpha: 0.2)
-                                  : Colors.amber.shade50)
+                            ? baseColor.withValues(alpha: 0.2)
                             : (isDark
                                   ? Colors.blue.withValues(alpha: 0.2)
                                   : Colors.blue.shade50),
@@ -261,13 +263,7 @@ class HistoryScreen extends StatelessWidget {
                       ),
                       child: Icon(
                         isToilet ? Icons.water_drop : Icons.local_drink,
-                        color: isToilet
-                            ? (isDark
-                                  ? Colors.amberAccent
-                                  : Colors.amber.shade700)
-                            : (isDark
-                                  ? Colors.blueAccent
-                                  : Colors.blue.shade700),
+                        color: baseColor,
                         size: 20,
                       ),
                     ),
@@ -279,9 +275,9 @@ class HistoryScreen extends StatelessWidget {
                             children: [
                               Text(
                                 isToilet
-                                    ? "Toilet Visit"
+                                    ? DateFormat('HH:mm').format(log.createdAt)
                                     : (log is DrinkLogEntry)
-                                    ? (log.fluidType)
+                                    ? DateFormat('HH:mm').format(log.createdAt)
                                     : "Unknown",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -298,15 +294,7 @@ class HistoryScreen extends StatelessWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: isToilet
-                                      ? (isDark
-                                            ? Colors.amber.withValues(
-                                                alpha: 0.2,
-                                              )
-                                            : Colors.amber.shade50)
-                                      : (isDark
-                                            ? Colors.blue.withValues(alpha: 0.2)
-                                            : Colors.blue.shade50),
+                                  color: baseColor.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -316,22 +304,17 @@ class HistoryScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    color: isToilet
-                                        ? (isDark
-                                              ? Colors.amberAccent
-                                              : Colors.amber.shade700)
-                                        : (isDark
-                                              ? Colors.blueAccent
-                                              : Colors.blue.shade700),
+                                    color: baseColor,
                                   ),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 4),
-                          // Only showing time here, as date is in the header
                           Text(
-                            DateFormat('HH:mm').format(log.createdAt),
+                            isToilet
+                                ? (log as UrineLogEntry).urgency.label
+                                : (log as DrinkLogEntry).fluidType,
                             style: TextStyle(
                               fontSize: 12,
                               color: isDark
