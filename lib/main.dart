@@ -12,9 +12,7 @@ import 'logic/bloc/log_bloc.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Check device type first
   final isWatch = await DeviceTypeHelper.isWearOS();
-  print("IS WATCH: $isWatch");
 
   try {
     await Config.load();

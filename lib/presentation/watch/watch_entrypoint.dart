@@ -1,3 +1,5 @@
+import 'package:flow/presentation/watch/pages/drink_wear_entry.dart';
+import 'package:flow/presentation/watch/pages/urine_log_entry_page.dart';
 import 'package:flow/presentation/watch/widgets/drink_wear_card.dart';
 import 'package:flow/presentation/watch/widgets/urine_wear_card.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,25 @@ class WatchEntrypoint extends StatelessWidget {
               Center(
                 child: UrineWearCard(
                   stats: dailyUrinationStats,
-                  onTap: () => print("Add Urine log"),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const UrineLogEntryPage(),
+                      ),
+                    );
+
+                    if (result != null && context.mounted) {
+                      context.read<LogBloc>().add(
+                        AddUrineLogEvent(
+                          color: result['color'],
+                          amount: result['amount'],
+                          urgency: result['urgency'],
+                          createdAt: result['created_at'],
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
               Center(
@@ -65,7 +85,22 @@ class WatchEntrypoint extends StatelessWidget {
                   stats: dailyDrinkStats,
                   goalLiters: goalLiters,
                   progress: progress,
-                  onTap: () => print("Add Drink log"),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const DrinkWearEntry()),
+                    );
+
+                    if (result != null && context.mounted) {
+                      context.read<LogBloc>().add(
+                        AddDrinkLogEvent(
+                          fluidType: result['type'],
+                          volume: result['volume'],
+                          createdAt: result['created_at'],
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
             ],
