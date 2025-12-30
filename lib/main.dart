@@ -58,7 +58,6 @@ class FlowTrackApp extends StatelessWidget {
           title: 'FlowTrack',
           debugShowCheckedModeBanner: false,
 
-          // Adapt Theme based on Device Type
           theme: ThemeData(
             useMaterial3: true,
             brightness: isWatch ? Brightness.dark : Brightness.light,

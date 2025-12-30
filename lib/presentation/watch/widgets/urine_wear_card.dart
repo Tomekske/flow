@@ -15,14 +15,14 @@ class UrineWearCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1, // Forces the widget to be a perfect square/circle
+      aspectRatio: 1,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: double.infinity,
-          margin: const EdgeInsets.all(4), // Tiny margin to not touch bezel
+          margin: const EdgeInsets.all(4),
           decoration: const BoxDecoration(
-            shape: BoxShape.circle, // <--- MAKES IT ROUND
+            shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: [Color(0xFFF59E0B), Color(0xFFFCD34D)],
               begin: Alignment.topCenter,
@@ -32,7 +32,6 @@ class UrineWearCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 1. Header (Pushed down slightly to fit top curve)
               const Padding(
                 padding: EdgeInsets.only(top: 8.0),
                 child: Row(
@@ -45,7 +44,7 @@ class UrineWearCard extends StatelessWidget {
                     ),
                     SizedBox(width: 4),
                     Text(
-                      "Visits", // Shortened text to fit width
+                      "Visits",
                       style: TextStyle(
                         color: Color(0xFFFFFBEB),
                         fontWeight: FontWeight.w600,
@@ -55,10 +54,7 @@ class UrineWearCard extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(height: 2),
-
-              // 2. Big Number (Center - widest part of circle)
               Expanded(
                 child: Center(
                   child: FittedBox(
@@ -81,8 +77,6 @@ class UrineWearCard extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // 3. Compact Stats Row
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -96,7 +90,6 @@ class UrineWearCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Time
                     Text(
                       stats.lastVisit != null
                           ? DateFormat('HH:mm').format(stats.lastVisit!)
@@ -107,14 +100,12 @@ class UrineWearCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // Vertical Divider
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 6),
                       width: 1,
                       height: 10,
                       color: Colors.white54,
                     ),
-                    // Frequency
                     Text(
                       stats.frequency,
                       style: const TextStyle(
@@ -127,7 +118,6 @@ class UrineWearCard extends StatelessWidget {
                 ),
               ),
 
-              // 4. Bottom padding spacer to clear bottom curve
               const SizedBox(height: 12),
             ],
           ),

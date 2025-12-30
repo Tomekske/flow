@@ -1,65 +1,47 @@
+import 'package:flow/data/models/urination_stats.dart';
 import 'package:flow/presentation/watch/widgets/urine_wear_card.dart';
 import 'package:flutter/material.dart';
-import 'package:wear_plus/wear_plus.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
-import '../../data/models/urination_stats.dart';
+import '../../../helpers/stats_helper.dart';
+import '../../../logic/bloc/log_bloc.dart';
+import '../mobile/widgets/urine_card.dart';
 
 class WatchEntrypoint extends StatelessWidget {
   const WatchEntrypoint({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.compact,
-      ),
-      // We pass the data into the screen here
-      home: UrineStatsScreen(
-        stats: UrinationStats(
-          total: 5,
-          frequency: "10h",
-          lastVisit: DateTime.now(),
-        ),
-        onLogTap: () {
-          print("Log button tapped");
-        },
-      ),
-    );
-  }
-}
-
-/// A reusable widget that handles the Wear OS layout logic
-class UrineStatsScreen extends StatelessWidget {
-  final UrinationStats stats;
-  final VoidCallback onLogTap;
-
-  const UrineStatsScreen({
-    super.key,
-    required this.stats,
-    required this.onLogTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: WatchShape(
-          builder: (BuildContext context, WearShape shape, Widget? child) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                UrineWearCard(
-                  stats: stats,
-                  onTap: onLogTap,
-                ),
-              ],
-            );
-          },
-        ),
+      body: BlocBuilder<LogBloc, LogState>(
+        builder: (context, state) {
+          final urineLogs = state.urineLogs;
+          final drinkLogs = state.drinkLogs;
+          final now = state.now;
+          final todayStr = DateFormat('yyyy-MM-dd').format(now);
+
+          // Filter logs
+          final todayUrineLogs = urineLogs
+              .where(
+                (l) => DateFormat('yyyy-MM-dd').format(l.createdAt) == todayStr,
+              )
+              .toList();
+
+          // Calculate Stats
+          final dailyUrinationStats = StatsHelper.getUrinationStats(
+            todayUrineLogs,
+            now: now,
+          );
+
+          return Center(
+            child: UrineWearCard(
+              stats: dailyUrinationStats,
+              onTap: () => print("Add Urine log"),
+            ),
+          );
+        },
       ),
     );
   }
