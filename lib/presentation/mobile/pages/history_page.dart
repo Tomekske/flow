@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../../data/models/drink_log_entry.dart';
-import '../../logic/bloc/log_bloc.dart';
+import '../../../data/models/drink_log_entry.dart';
+import '../../../logic/bloc/log_bloc.dart';
 import '../dialogs/confirm_dialog.dart';
 import '../dialogs/drink_dialog.dart';
 import '../dialogs/urine_dialog.dart';

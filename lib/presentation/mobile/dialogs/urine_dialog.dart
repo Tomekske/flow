@@ -2,7 +2,7 @@ import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../data/enums/urine_color.dart';
+import '../../../data/enums/urine_color.dart';
 
 class UrineDialog extends StatefulWidget {
   final UrineLogEntry? existingLog;

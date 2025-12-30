@@ -1,19 +1,19 @@
-import 'package:flow/presentation/pages/settings_page.dart';
+import 'package:flow/presentation/mobile/pages/history_page.dart';
+import 'package:flow/presentation/mobile/pages/home_page.dart';
+import 'package:flow/presentation/mobile/pages/settings_page.dart';
+import 'package:flow/presentation/mobile/pages/stats_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../logic/bloc/log_bloc.dart';
-import 'pages/home_page.dart';
-import 'pages/stats_page.dart';
-import 'pages/history_page.dart';
+import '../../../logic/bloc/log_bloc.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class MobileEntrypoint extends StatefulWidget {
+  const MobileEntrypoint({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MobileEntrypoint> createState() => _MobileEntrypointState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MobileEntrypointState extends State<MobileEntrypoint> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [

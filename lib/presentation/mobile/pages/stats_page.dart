@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/enums/chart_type.dart';
-import '../../helpers/stats_helper.dart';
-import '../../logic/bloc/log_bloc.dart';
+import '../../../data/enums/chart_type.dart';
+import '../../../helpers/stats_helper.dart';
+import '../../../logic/bloc/log_bloc.dart';
 import '../widgets/chart_widget.dart';
 
 class StatsScreen extends StatefulWidget {
@@ -153,7 +153,6 @@ class _StatsScreenState extends State<StatsScreen> {
 
                     return Expanded(
                       child: GestureDetector(
-                        // UPDATED: Set state with Enum
                         onTap: () => setState(() => _statType = type),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -168,7 +167,9 @@ class _StatsScreenState extends State<StatsScreen> {
                             boxShadow: isSelected
                                 ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
