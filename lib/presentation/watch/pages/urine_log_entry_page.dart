@@ -24,6 +24,12 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
 
   final PageController _mainPageController = PageController();
 
+  @override
+  void dispose() {
+    _mainPageController.dispose();
+    super.dispose();
+  }
+
   void _onSave() {
     Navigator.pop(context, {
       'color': _selectedColor,
@@ -31,6 +37,24 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
       'urgency': _selectedUrgency,
       'created_at': DateTime.now(),
     });
+  }
+
+  void _goToNextPage() {
+    if (_mainPageController.hasClients) {
+      _mainPageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _goToPreviousPage() {
+    if (_mainPageController.hasClients) {
+      _mainPageController.previousPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   @override
@@ -88,6 +112,9 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
             return GestureDetector(
               onTap: () {
                 setState(() => _selectedColor = option);
+                Future.delayed(const Duration(milliseconds: 150), () {
+                  _goToNextPage();
+                });
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -125,7 +152,14 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
           ),
         ),
         const SizedBox(height: 10),
-        const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
+        GestureDetector(
+          onTap: _goToNextPage,
+          child: const Icon(
+            Icons.keyboard_arrow_down,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
       ],
     );
   }
@@ -135,7 +169,14 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
 
     return _buildStepContainer(
       children: [
-        const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
+        GestureDetector(
+          onTap: _goToPreviousPage,
+          child: const Icon(
+            Icons.keyboard_arrow_up,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           "SELECT URGENCY",
@@ -158,13 +199,16 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
             return GestureDetector(
               onTap: () {
                 setState(() => _selectedUrgency = urgencyValue);
+                Future.delayed(const Duration(milliseconds: 150), () {
+                  _goToNextPage();
+                });
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 10,
-                ), // Compact padding
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white : Colors.white10,
                   borderRadius: BorderRadius.circular(20),
@@ -187,15 +231,30 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
           }).toList(),
         ),
         const SizedBox(height: 15),
-        const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
+        GestureDetector(
+          onTap: _goToNextPage,
+          child: const Icon(
+            Icons.keyboard_arrow_down,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
       ],
     );
   }
 
+  // --- Step 3: Volume ---
   Widget _buildVolumeStep() {
     return _buildStepContainer(
       children: [
-        const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
+        GestureDetector(
+          onTap: _goToPreviousPage,
+          child: const Icon(
+            Icons.keyboard_arrow_up,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           "SELECT VOLUME",
@@ -216,6 +275,9 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
             return GestureDetector(
               onTap: () {
                 setState(() => _selectedAmount = amount);
+                Future.delayed(const Duration(milliseconds: 150), () {
+                  _goToNextPage();
+                });
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -244,7 +306,14 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
           }).toList(),
         ),
         const SizedBox(height: 15),
-        const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
+        GestureDetector(
+          onTap: _goToNextPage,
+          child: const Icon(
+            Icons.keyboard_arrow_down,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
       ],
     );
   }
@@ -254,7 +323,14 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 20),
-        const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
+        GestureDetector(
+          onTap: _goToPreviousPage,
+          child: const Icon(
+            Icons.keyboard_arrow_up,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
         const Spacer(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
