@@ -3,12 +3,13 @@ part of 'log_bloc.dart';
 enum LogStatus { initial, loading, success, failure }
 
 class LogState extends Equatable {
+  // Separate lists for urine and drink logs, each sorted by date
   final List<UrineLogEntry> urineLogs;
   final List<DrinkLogEntry> drinkLogs;
   final DateTime now;
   final LogStatus status;
-  final String theme;
-  final double dailyGoal;
+  final String theme; // 'light' or 'dark'
+  final double dailyGoal; // in Liters
 
   const LogState({
     this.urineLogs = const [],
