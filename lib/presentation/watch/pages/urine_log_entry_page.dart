@@ -9,7 +9,6 @@ class UrineLogEntryPage extends StatefulWidget {
 }
 
 class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
-  // Defaults
   UrineColor _selectedColor = UrineColor.yellow;
   String _selectedAmount = 'Medium';
   int _selectedUrgency = 2;
@@ -23,38 +22,7 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
     4: 'Urgent',
   };
 
-  // Controllers for the horizontal carousels
-  late PageController _colorController;
-  late PageController _urgencyController;
-  late PageController _volumeController;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize controllers to the default selected indices
-    _colorController = PageController(
-      viewportFraction: 0.35,
-      initialPage: UrineColor.values.indexOf(_selectedColor),
-    );
-
-    _urgencyController = PageController(
-      viewportFraction: 0.5,
-      initialPage: _selectedUrgency - 1,
-    );
-
-    _volumeController = PageController(
-      viewportFraction: 0.5,
-      initialPage: _amounts.indexOf(_selectedAmount),
-    );
-  }
-
-  @override
-  void dispose() {
-    _colorController.dispose();
-    _urgencyController.dispose();
-    _volumeController.dispose();
-    super.dispose();
-  }
+  final PageController _mainPageController = PageController();
 
   void _onSave() {
     Navigator.pop(context, {
@@ -70,6 +38,7 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: PageView(
+        controller: _mainPageController,
         scrollDirection: Axis.vertical,
         children: [
           _buildColorStep(),
@@ -81,9 +50,24 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
     );
   }
 
+  Widget _buildStepContainer({required List<Widget> children}) {
+    return Center(
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: children,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildColorStep() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return _buildStepContainer(
       children: [
         const Text(
           "SELECT COLOR",
@@ -95,27 +79,26 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 80,
-          child: PageView.builder(
-            controller: _colorController,
-            itemCount: UrineColor.values.length,
-            onPageChanged: (index) {
-              setState(() => _selectedColor = UrineColor.values[index]);
-            },
-            itemBuilder: (context, index) {
-              final option = UrineColor.values[index];
-              final isSelected = _selectedColor == option;
-
-              return AnimatedContainer(
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          alignment: WrapAlignment.center,
+          children: UrineColor.values.map((option) {
+            final isSelected = _selectedColor == option;
+            return GestureDetector(
+              onTap: () {
+                setState(() => _selectedColor = option);
+              },
+              child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: option.color,
                   border: isSelected
                       ? Border.all(color: Colors.white, width: 3)
-                      : Border.all(color: Colors.transparent, width: 3),
+                      : Border.all(color: Colors.transparent, width: 2),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
@@ -126,13 +109,13 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
                       : [],
                 ),
                 child: isSelected
-                    ? const Icon(Icons.check, color: Colors.black54)
+                    ? const Icon(Icons.check, color: Colors.black54, size: 20)
                     : null,
-              );
-            },
-          ),
+              ),
+            );
+          }).toList(),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 15),
         Text(
           _selectedColor.label,
           style: const TextStyle(
@@ -141,7 +124,7 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 10),
         const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
       ],
     );
@@ -150,11 +133,10 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
   Widget _buildUrgencyStep() {
     final urgencies = _urgencyLabels.keys.toList();
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return _buildStepContainer(
       children: [
         const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
         const Text(
           "SELECT URGENCY",
           style: TextStyle(
@@ -164,48 +146,57 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
             letterSpacing: 1.2,
           ),
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 60,
-          child: PageView.builder(
-            controller: _urgencyController,
-            itemCount: urgencies.length,
-            onPageChanged: (index) {
-              setState(() => _selectedUrgency = urgencies[index]);
-            },
-            itemBuilder: (context, index) {
-              final urgencyValue = urgencies[index];
-              final label = _urgencyLabels[urgencyValue]!;
-              final isSelected = _selectedUrgency == urgencyValue;
+        const SizedBox(height: 15),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: urgencies.map((urgencyValue) {
+            final label = _urgencyLabels[urgencyValue]!;
+            final isSelected = _selectedUrgency == urgencyValue;
 
-              return Center(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
+            return GestureDetector(
+              onTap: () {
+                setState(() => _selectedUrgency = urgencyValue);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ), // Compact padding
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white : Colors.white10,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? Colors.white : Colors.transparent,
+                  ),
+                ),
+                child: Text(
+                  label,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.grey[700],
-                    fontSize: isSelected ? 20 : 16,
+                    color: isSelected ? Colors.black : Colors.white,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
+                    fontSize: 14,
                   ),
-                  child: Text(label),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          }).toList(),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 15),
         const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
       ],
     );
   }
 
   Widget _buildVolumeStep() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return _buildStepContainer(
       children: [
         const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
         const Text(
           "SELECT VOLUME",
           style: TextStyle(
@@ -215,36 +206,44 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
             letterSpacing: 1.2,
           ),
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 60,
-          child: PageView.builder(
-            controller: _volumeController,
-            itemCount: _amounts.length,
-            onPageChanged: (index) {
-              setState(() => _selectedAmount = _amounts[index]);
-            },
-            itemBuilder: (context, index) {
-              final amount = _amounts[index];
-              final isSelected = _selectedAmount == amount;
-
-              return Center(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
+        const SizedBox(height: 15),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+          children: _amounts.map((amount) {
+            final isSelected = _selectedAmount == amount;
+            return GestureDetector(
+              onTap: () {
+                setState(() => _selectedAmount = amount);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white : Colors.white10,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? Colors.white : Colors.transparent,
+                  ),
+                ),
+                child: Text(
+                  amount,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.grey[700],
-                    fontSize: isSelected ? 20 : 16,
+                    color: isSelected ? Colors.black : Colors.white,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
-                  child: Text(amount),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          }).toList(),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 15),
         const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
       ],
     );
@@ -254,6 +253,7 @@ class _UrineLogEntryPageState extends State<UrineLogEntryPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        const SizedBox(height: 20),
         const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
         const Spacer(),
         Row(

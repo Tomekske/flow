@@ -13,6 +13,8 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
   String _selectedType = 'Water';
   int _selectedVolume = 250;
 
+  final PageController _pageController = PageController();
+
   final List<Map<String, dynamic>> _types = [
     {'id': 'Water', 'icon': Icons.water_drop_rounded, 'label': 'Water'},
     {'id': 'Soda', 'icon': FontAwesomeIcons.burger, 'label': 'Soda'},
@@ -23,29 +25,11 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
     {'id': 'Alcohol', 'icon': Icons.liquor_rounded, 'label': 'Alcohol'},
   ];
 
-  final List<int> _volumes = [200, 250, 330, 500];
-
-  late PageController _typeController;
-  late PageController _volumeController;
-
-  @override
-  void initState() {
-    super.initState();
-    _typeController = PageController(
-      viewportFraction: 0.35,
-      initialPage: _types.indexWhere((t) => t['id'] == _selectedType),
-    );
-
-    _volumeController = PageController(
-      viewportFraction: 0.5,
-      initialPage: _volumes.indexOf(_selectedVolume),
-    );
-  }
+  final List<int> _volumes = [100, 150, 200, 250, 300, 350];
 
   @override
   void dispose() {
-    _typeController.dispose();
-    _volumeController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -57,11 +41,30 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
     });
   }
 
+  void _goToNextPage() {
+    if (_pageController.hasClients) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _goToPreviousPage() {
+    if (_pageController.hasClients) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: PageView(
+        controller: _pageController,
         scrollDirection: Axis.vertical,
         children: [
           _buildTypeStep(),
@@ -72,10 +75,24 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
     );
   }
 
-  // --- Step 1: Type Carousel ---
+  Widget _buildStepContainer({required List<Widget> children}) {
+    return Center(
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: children,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTypeStep() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return _buildStepContainer(
       children: [
         const Text(
           "SELECT DRINK",
@@ -86,80 +103,101 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
             letterSpacing: 1.2,
           ),
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 80,
-          child: PageView.builder(
-            controller: _typeController,
-            itemCount: _types.length,
-            onPageChanged: (index) {
-              setState(() => _selectedType = _types[index]['id']);
-            },
-            itemBuilder: (context, index) {
-              final type = _types[index];
-              final isSelected = _selectedType == type['id'];
-              final iconData = type['icon'];
+        const SizedBox(height: 15),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          alignment: WrapAlignment.center,
+          children: _types.map((type) {
+            final isSelected = _selectedType == type['id'];
+            final iconData = type['icon'];
 
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected
-                      ? const Color(0xFF2563EB)
-                      : const Color(0xFF1E293B),
-                  border: isSelected
-                      ? Border.all(color: Colors.white, width: 3)
-                      : Border.all(color: Colors.transparent, width: 3),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF2563EB,
-                            ).withValues(alpha: 0.6),
-                            blurRadius: 10,
-                          ),
-                        ]
-                      : [],
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() => _selectedType = type['id']);
+                    Future.delayed(const Duration(milliseconds: 150), () {
+                      _goToNextPage();
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? const Color(0xFF2563EB)
+                          : const Color(0xFF1E293B),
+                      border: isSelected
+                          ? Border.all(color: Colors.white, width: 2)
+                          : Border.all(color: Colors.transparent, width: 2),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: const Color(0xFF2563EB).withOpacity(0.6),
+                                blurRadius: 10,
+                              ),
+                            ]
+                          : [],
+                    ),
+                    child: Center(
+                      child: iconData is IconData
+                          ? Icon(
+                              iconData,
+                              color: isSelected ? Colors.white : Colors.grey,
+                              size: 22,
+                            )
+                          : FaIcon(
+                              iconData,
+                              color: isSelected ? Colors.white : Colors.grey,
+                              size: 18,
+                            ),
+                    ),
+                  ),
                 ),
-                child: Center(
-                  child: iconData is IconData
-                      ? Icon(
-                          iconData,
-                          color: isSelected ? Colors.white : Colors.grey,
-                          size: 24,
-                        )
-                      : FaIcon(
-                          iconData,
-                          color: isSelected ? Colors.white : Colors.grey,
-                          size: 20,
-                        ),
+                const SizedBox(height: 4),
+                Text(
+                  type['label'],
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.grey,
+                    fontSize: 10,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
                 ),
-              );
-            },
+              ],
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 15),
+        GestureDetector(
+          onTap: _goToNextPage,
+          child: const Icon(
+            Icons.keyboard_arrow_down,
+            color: Colors.grey,
+            size: 24,
           ),
         ),
-        const SizedBox(height: 12),
-        Text(
-          _selectedType,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
       ],
     );
   }
 
   Widget _buildVolumeStep() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return _buildStepContainer(
       children: [
-        const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
-        const SizedBox(height: 4),
+        GestureDetector(
+          onTap: _goToPreviousPage,
+          child: const Icon(
+            Icons.keyboard_arrow_up,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
+        const SizedBox(height: 8),
         const Text(
           "SELECT VOLUME",
           style: TextStyle(
@@ -169,45 +207,68 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
             letterSpacing: 1.2,
           ),
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 60,
-          child: PageView.builder(
-            controller: _volumeController,
-            itemCount: _volumes.length,
-            onPageChanged: (index) {
-              setState(() => _selectedVolume = _volumes[index]);
-            },
-            itemBuilder: (context, index) {
-              final vol = _volumes[index];
-              final isSelected = _selectedVolume == vol;
+        const SizedBox(height: 15),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          alignment: WrapAlignment.center,
+          children: _volumes.map((vol) {
+            final isSelected = _selectedVolume == vol;
 
-              return Center(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
+            return GestureDetector(
+              onTap: () {
+                setState(() => _selectedVolume = vol);
+                Future.delayed(const Duration(milliseconds: 150), () {
+                  _goToNextPage();
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 10,
+                ),
+                width: 90,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? const Color(0xFF2563EB)
+                      : const Color(
+                          0xFF1E293B,
+                        ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: isSelected
+                      ? Border.all(color: Colors.white, width: 1.5)
+                      : Border.all(color: Colors.transparent),
+                ),
+                child: Text(
+                  "$vol ml",
                   style: TextStyle(
-                    color: isSelected
-                        ? const Color(0xFF2563EB)
-                        : Colors.grey[700],
-                    fontSize: isSelected ? 24 : 18,
+                    color: isSelected ? Colors.white : Colors.grey[400],
+                    fontSize: 12,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
-                  child: Text("$vol ml"),
                 ),
-              );
-            },
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 15),
+        GestureDetector(
+          onTap: _goToNextPage,
+          child: const Icon(
+            Icons.keyboard_arrow_down,
+            color: Colors.grey,
+            size: 24,
           ),
         ),
-        const SizedBox(height: 20),
-        const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 16),
       ],
     );
   }
 
   Widget _buildSaveStep() {
-    // Find icon for summary
     final selectedIconData = _types.firstWhere(
       (t) => t['id'] == _selectedType,
       orElse: () => _types.first,
@@ -216,24 +277,36 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 16),
+        const SizedBox(height: 20),
+        GestureDetector(
+          onTap: _goToPreviousPage,
+          child: const Icon(
+            Icons.keyboard_arrow_up,
+            color: Colors.grey,
+            size: 24,
+          ),
+        ),
         const Spacer(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             selectedIconData is IconData
-                ? Icon(selectedIconData, color: Colors.blue, size: 16)
-                : FaIcon(selectedIconData, color: Colors.blue, size: 16),
-            const SizedBox(width: 8),
+                ? Icon(selectedIconData, color: Colors.blue, size: 20)
+                : FaIcon(selectedIconData, color: Colors.blue, size: 20),
+            const SizedBox(width: 10),
             Text(
               "$_selectedVolume ml",
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         SizedBox(
-          width: 120,
+          width: 140,
           height: 48,
           child: ElevatedButton(
             onPressed: _onSave,
@@ -241,10 +314,14 @@ class _DrinkWearEntryState extends State<DrinkWearEntry> {
               backgroundColor: const Color(0xFF2563EB),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(30),
               ),
+              elevation: 4,
             ),
-            child: const Text("Save"),
+            child: const Text(
+              "Save",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
           ),
         ),
         const Spacer(),
