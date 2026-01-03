@@ -3,7 +3,7 @@ import 'package:flow/data/models/drink_log_entry.dart';
 import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/enums/chart_type.dart';
+import '../../../data/enums/chart_type.dart';
 
 class ChartWidget extends StatelessWidget {
   final List<UrineLogEntry> urineLogs;

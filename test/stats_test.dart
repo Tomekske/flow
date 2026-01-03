@@ -1,4 +1,3 @@
-import 'package:flow/data/enums/urgency_level.dart';
 import 'package:flow/data/enums/urine_color.dart';
 import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flow/helpers/stats_helper.dart';
@@ -172,14 +171,14 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
         ],
         [
@@ -189,14 +188,14 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
 
           // Interval 2
@@ -205,14 +204,14 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(1, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
         ],
         [
@@ -222,14 +221,14 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
 
           // Interval 2
@@ -238,21 +237,21 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(1, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(2, 15),
             id: 3,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
 
           // Interval 3
@@ -261,7 +260,7 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
         ],
         [
@@ -271,21 +270,21 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(0, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(2, 15),
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
 
           // Interval 2
@@ -294,21 +293,21 @@ void main() {
             id: 1,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(1, 30),
             id: 2,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
           UrineLogEntry(
             createdAt: time(2, 15),
             id: 3,
             color: UrineColor.clear,
             amount: 'Medium',
-            urgency: UrgencyLevel.low,
+            urgency: 1,
           ),
         ],
       ];

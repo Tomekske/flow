@@ -2,12 +2,10 @@ import 'package:flow/data/models/urine_log_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../data/enums/urgency_level.dart'; // Import the new enum
-import '../../data/enums/urine_color.dart';
+import '../../../data/enums/urine_color.dart';
 
 class UrineDialog extends StatefulWidget {
   final UrineLogEntry? existingLog;
-
   const UrineDialog({super.key, this.existingLog});
 
   @override
@@ -17,12 +15,17 @@ class UrineDialog extends StatefulWidget {
 class _UrineDialogState extends State<UrineDialog> {
   UrineColor _selectedColor = UrineColor.yellow;
   String _selectedAmount = 'Medium';
-
-  // Use the Enum directly in state
-  UrgencyLevel _selectedUrgency = UrgencyLevel.normal;
+  int _selectedUrgency = 2; // Default to Normal (2)
   late DateTime _selectedTime;
 
   final List<String> _amounts = ['Small', 'Medium', 'Large'];
+
+  final Map<int, String> _urgencyLabels = {
+    1: 'Low',
+    2: 'Normal',
+    3: 'High',
+    4: 'Urgent',
+  };
 
   @override
   void initState() {
@@ -94,6 +97,8 @@ class _UrineDialogState extends State<UrineDialog> {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // Date Time Picker
               Text(
                 "Time",
                 style: TextStyle(
@@ -230,12 +235,14 @@ class _UrineDialogState extends State<UrineDialog> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
-                  children: UrgencyLevel.values.map((level) {
-                    final bool isSelected = _selectedUrgency == level;
+                  children: _urgencyLabels.entries.map((entry) {
+                    final int value = entry.key;
+                    final String label = entry.value;
+                    final bool isSelected = _selectedUrgency == value;
 
                     return Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => _selectedUrgency = level),
+                        onTap: () => setState(() => _selectedUrgency = value),
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
@@ -256,7 +263,7 @@ class _UrineDialogState extends State<UrineDialog> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            level.label,
+                            label,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -315,7 +322,7 @@ class _UrineDialogState extends State<UrineDialog> {
                         Navigator.pop(context, {
                           'color': _selectedColor,
                           'amount': _selectedAmount,
-                          'urgency': _selectedUrgency,
+                          'urgency': _selectedUrgency, // Returns int (1-4)
                           'created_at': _selectedTime,
                         });
                       },
@@ -345,6 +352,7 @@ class _UrineDialogState extends State<UrineDialog> {
     );
   }
 
+  // Helper for Volume (String based)
   Widget _buildVolumeControl(bool isDark) {
     return Container(
       padding: const EdgeInsets.all(4),
