@@ -51,12 +51,14 @@ class HistoryScreen extends StatelessWidget {
         context.read<LogBloc>().add(UpdateDrinkLogEvent(updatedDrinkLog));
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Log updated!'),
-          duration: Duration(seconds: 1),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Log updated!'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
     }
   }
 

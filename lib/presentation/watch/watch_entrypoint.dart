@@ -92,13 +92,18 @@ class WatchEntrypoint extends StatelessWidget {
                     );
 
                     if (result != null && context.mounted) {
-                      context.read<LogBloc>().add(
-                        AddDrinkLogEvent(
-                          fluidType: result['type'],
-                          volume: result['volume'],
-                          createdAt: result['created_at'],
-                        ),
-                      );
+                      if (result is Map<String, dynamic> &&
+                          result.containsKey('type') &&
+                          result.containsKey('volume') &&
+                          result.containsKey('created_at')) {
+                        context.read<LogBloc>().add(
+                          AddDrinkLogEvent(
+                            fluidType: result['type'],
+                            volume: result['volume'],
+                            createdAt: result['created_at'],
+                          ),
+                        );
+                      }
                     }
                   },
                 ),
